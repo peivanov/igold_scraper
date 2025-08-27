@@ -80,6 +80,9 @@ The scraper introduces random delays between requests to avoid overloading the s
 
 The site structure may change, requiring regex/pattern updates.
 
-The script is for educational and personal use only.
-Please check igold.bg’s Terms of Service before heavy use.
+## The script is for educational and personal use only.
+## Please check igold.bg’s Terms of Service before heavy use.
 
+## 📜 License
+
+This project is licensed under the MIT License – see the LICENSE file for details
