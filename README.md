@@ -66,7 +66,7 @@ Once your venv is active, run:
 pip install -r requirements.txt
 
 4. Run the scraper
-python igold_bg_coins_and_bars_scraper.py
+python igold_scraper.py
 
 
 The results will be saved in:
