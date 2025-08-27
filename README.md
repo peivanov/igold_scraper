@@ -32,8 +32,8 @@ The script gathers product information, detects product type, and generates a **
 
 ```bash
 ### 1. Clone the repo
-git clone https://github.com/YOUR_USERNAME/igold-bg-scraper.git
-cd igold-bg-scraper
+git clone https://github.com:peivanov/igold_scraper.git
+cd igold_scraper
 
 2. Set up a virtual environment (Recommended)
 🔹 On Ubuntu / Linux
