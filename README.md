@@ -1,6 +1,6 @@
 # igold.bg Gold Scraper (Coins & Bars)
 
-A comprehensive Python scraper for [igold.bg](https://igold.bg), extracting product details for **investment gold coins** (монети) and **gold bars** (кюлчета).  
+A comprehensive Python scraper for [igold.bg](https://igold.bg), extracting product details for **investment gold coins** and **gold bars**.  
 The script gathers product information, detects product type, and generates a **CSV report sorted by the lowest price per gram of fine gold**.
 
 ---
@@ -30,8 +30,8 @@ The script gathers product information, detects product type, and generates a **
 
 ## 🚀 Getting Started
 
-### 1. Clone the repo
 ```bash
+### 1. Clone the repo
 git clone https://github.com/YOUR_USERNAME/igold-bg-scraper.git
 cd igold-bg-scraper
 
@@ -74,7 +74,7 @@ The results will be saved in:
 igold_gold_products_sorted.csv
 ```
 
-⚠️ Notes
+## ⚠️ Notes
 
 The scraper introduces random delays between requests to avoid overloading the server.
 
