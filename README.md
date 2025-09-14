@@ -19,11 +19,34 @@ The script gathers product information, detects product type, and generates a **
   - Prices in **BGN** and **EUR** (if available)  
   - Buy/Sell prices (if listed)  
   - Computed **price per gram of fine gold**
+  - **Spread percentage** - dealer markup calculated as `((sell_price - buy_price) / sell_price) × 100`
 - Handles **multiple formats** of weight, purity, and price parsing.
 - Exports results as `igold_gold_products_sorted.csv`, sorted by **cheapest per gram**.
 - Displays summaries:
   - Top cheapest / most expensive products
   - Breakdown by bars vs coins
+
+---
+
+## 📊 Spread Analysis
+
+The scraper now calculates the **spread percentage** for each product, which represents the dealer's markup between buy and sell prices. This helps identify:
+
+- **Investment efficiency**: Lower spreads mean better value for investors
+- **Product categories**: Gold bars typically have lower spreads than coins
+- **Size premium**: Larger bars generally offer better spreads
+- **Collectible premium**: Numismatic items have higher spreads due to collector value
+
+### Spread Formula
+```
+Spread % = ((Sell Price - Buy Price) / Sell Price) × 100
+```
+
+### Typical Spread Ranges (to end of 2025)
+- **Large investment bars** (50g+): 0.5% - 1.5%
+- **1oz investment bars/coins**: 0.5% - 2%
+- **Smaller bars/coins**: 1% - 5%
+- **Collectible/numismatic items**: 5% - 30%
 
 ---
 

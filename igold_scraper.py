@@ -18,6 +18,7 @@ Outputs columns:
 - price_per_g_fine_eur
 - buy_price_bgn (if available)
 - sell_price_bgn (if available)
+- spread_percentage (calculated as ((sell_price_bgn - buy_price_bgn) / sell_price_bgn) * 100)
 
 Results are sorted by price per gram (ascending - lowest to highest) (BGN). Items without price per gram are placed at the end.
 """
@@ -448,6 +449,7 @@ def extract_product_data(url):
         'price_per_g_fine_eur': None,
         'buy_price_bgn': buy_price,
         'sell_price_bgn': sell_price,
+        'spread_percentage': None,
     }
 
     # Compute price per gram
@@ -462,6 +464,14 @@ def extract_product_data(url):
                 data['price_per_g_fine_eur'] = round(price_eur / fine_gold, 2)
             except:
                 pass
+
+    # Calculate spread percentage
+    if buy_price and sell_price and sell_price > 0:
+        try:
+            spread = ((sell_price - buy_price) / sell_price) * 100
+            data['spread_percentage'] = round(spread, 2)
+        except:
+            pass
 
     return data
 
@@ -648,7 +658,7 @@ def main():
     fname = 'igold_gold_products_sorted.csv'
     keys = ['product_name','url','product_type','total_weight_g','purity_per_mille','fine_gold_g',
             'price_bgn','price_eur','price_per_g_fine_bgn','price_per_g_fine_eur',
-            'buy_price_bgn','sell_price_bgn']
+            'buy_price_bgn','sell_price_bgn','spread_percentage']
     
     with open(fname, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=keys, delimiter=';')
@@ -717,6 +727,30 @@ def main():
                 logger.info(f"   Total price: {item['price_bgn']} BGN")
                 logger.info(f"   Weight: {item['total_weight_g']} g")
                 logger.info("")
+
+    # Show spread analysis
+    with_spread = [r for r in results if r.get('spread_percentage') is not None]
+    if with_spread:
+        # Sort by spread for analysis
+        spread_sorted = sorted(with_spread, key=lambda x: x['spread_percentage'])
+
+        logger.info(f"\n=== TOP 5 PRODUCTS WITH LOWEST SPREAD ===")
+        for i, item in enumerate(spread_sorted[:5]):
+            name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
+            logger.info(f"{i+1}. {name} ({item['product_type']})")
+            logger.info(f"   Spread: {item['spread_percentage']}%")
+            logger.info(f"   Buy price: {item['buy_price_bgn']} BGN")
+            logger.info(f"   Sell price: {item['sell_price_bgn']} BGN")
+            logger.info("")
+
+        logger.info(f"\n=== TOP 5 PRODUCTS WITH HIGHEST SPREAD ===")
+        for i, item in enumerate(spread_sorted[-5:][::-1]):  # Last 5, reversed
+            name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
+            logger.info(f"{i+1}. {name} ({item['product_type']})")
+            logger.info(f"   Spread: {item['spread_percentage']}%")
+            logger.info(f"   Buy price: {item['buy_price_bgn']} BGN")
+            logger.info(f"   Sell price: {item['sell_price_bgn']} BGN")
+            logger.info("")
 
 if __name__ == '__main__':
     main()
