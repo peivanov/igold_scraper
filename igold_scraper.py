@@ -21,6 +21,12 @@ Outputs columns:
 - spread_percentage (calculated as ((sell_price_bgn - buy_price_bgn) / sell_price_bgn) * 100)
 
 Results are sorted by price per gram (ascending - lowest to highest) (BGN). Items without price per gram are placed at the end.
+
+If the --compare-tavex flag is used, additional columns are added:
+- tavex_buy_price_bgn
+- tavex_sell_price_bgn
+- tavex_spread_percentage
+- is_cheaper (YES if igold sell price is cheaper than tavex sell price, NO otherwise)
 """
 
 import re
@@ -28,11 +34,15 @@ import csv
 import time
 import random
 import logging
-import sys
+import json
+import argparse
 from urllib.parse import urljoin, urlparse
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+
+# Import tavex scraper functionality
+from tavex_scraper import scrape_tavex_gold_products
 
 # Setup basic logging
 logging.basicConfig(
@@ -616,10 +626,125 @@ def sort_key_function(item):
     else:
         return (1, 0)  # (priority, fallback) - 1 = low priority, items without price go to end
 
+def find_tavex_equivalent(igold_product, tavex_products, equivalent_products):
+    """
+    Find the equivalent Tavex product for an igold product.
+
+    Args:
+        igold_product: Dictionary containing igold product data
+        tavex_products: List of dictionaries containing Tavex product data
+        equivalent_products: Dictionary mapping igold product names to Tavex product names
+
+    Returns:
+        Dictionary with tavex_buy_price_bgn, tavex_sell_price_bgn, tavex_spread_percentage, is_cheaper
+        or None if no equivalent is found
+    """
+    igold_name = igold_product.get('product_name')
+    if not igold_name:
+        return None
+
+    # Check if we have an equivalent in our mapping
+    tavex_name = equivalent_products.get(igold_name)
+    if not tavex_name:
+        return None
+
+    # Find the Tavex product with that name
+    for tavex_product in tavex_products:
+        if tavex_product.get('name') == tavex_name:
+            # Get the Tavex data
+            tavex_buy_price = tavex_product.get('buy_price')
+            tavex_sell_price = tavex_product.get('sell_price')
+            tavex_spread = tavex_product.get('spread_percentage')
+
+            # Determine if igold is cheaper
+            is_cheaper = "NO"
+            igold_sell_price = igold_product.get('sell_price_bgn')
+            if igold_sell_price and tavex_sell_price and igold_sell_price < tavex_sell_price:
+                is_cheaper = "YES"
+
+            return {
+                'tavex_buy_price_bgn': tavex_buy_price,
+                'tavex_sell_price_bgn': tavex_sell_price,
+                'tavex_spread_percentage': tavex_spread,
+                'is_cheaper': is_cheaper,
+                'tavex_product_name': tavex_name
+            }
+
+    return None
+
+def add_tavex_data_to_results(results, tavex_products, equivalent_products):
+    """
+    Add Tavex comparison data to the igold results.
+
+    Args:
+        results: List of dictionaries containing igold product data
+        tavex_products: List of dictionaries containing Tavex product data
+        equivalent_products: Dictionary mapping igold product names to Tavex product names
+
+    Returns:
+        Updated results list with Tavex data
+    """
+    logger.info(f"Adding Tavex comparison data to {len(results)} igold products...")
+
+    # Track statistics
+    matched_count = 0
+    cheaper_count = 0
+
+    for result in results:
+        # Find Tavex equivalent
+        tavex_data = find_tavex_equivalent(result, tavex_products, equivalent_products)
+
+        if tavex_data:
+            # Add Tavex data to the result
+            result.update(tavex_data)
+            matched_count += 1
+            if tavex_data['is_cheaper'] == "YES":
+                cheaper_count += 1
+        else:
+            # If no match, add None values
+            result['tavex_buy_price_bgn'] = None
+            result['tavex_sell_price_bgn'] = None
+            result['tavex_spread_percentage'] = None
+            result['is_cheaper'] = None
+            result['tavex_product_name'] = None
+
+    logger.info(f"Found Tavex equivalents for {matched_count} products")
+    logger.info(f"igold is cheaper for {cheaper_count} products")
+
+    return results
+
 def main():
-    print(f"Starting igold.bg gold scraper by {sys.argv[0]}")
+    # Setup command line arguments
+    parser = argparse.ArgumentParser(description='igold.bg gold scraper')
+    parser.add_argument('--compare-tavex', action='store_true', help='Compare with Tavex prices')
+    parser.add_argument('--add-timestamp', action='store_true', help='Add timestamp to output filename (format: ddmmyyhhmm)')
+    args = parser.parse_args()
+
+    print(f"Starting igold.bg gold scraper")
     print(f"Scraping both gold coins and gold bars...")
     
+    # If comparing with Tavex, load necessary data
+    tavex_products = None
+    equivalent_products = None
+
+    if args.compare_tavex:
+        print("Comparing with Tavex prices is enabled")
+
+        # Load equivalent products mapping
+        try:
+            with open('equivalent_products.json', 'r', encoding='utf-8') as f:
+                equivalent_products = json.load(f)
+            print(f"Loaded {len(equivalent_products)} product mappings from equivalent_products.json")
+        except Exception as e:
+            logger.error(f"Failed to load equivalent_products.json: {e}")
+            print("Cannot continue with Tavex comparison without equivalent_products.json")
+            return
+
+        # Scrape Tavex products
+        print("Scraping Tavex products...")
+        tavex_products = scrape_tavex_gold_products()
+        print(f"Scraped {len(tavex_products)} products from Tavex")
+
     links = gather_product_links()
     logger.info(f"Found {len(links)} candidate product links.")
     
@@ -648,18 +773,37 @@ def main():
             if failed_count <= 5:  # Show first few failures for debugging
                 logger.warning(f"Failed to extract data from: {link}")
 
+    # If comparing with Tavex, add Tavex data to results
+    if args.compare_tavex and tavex_products and equivalent_products:
+        results = add_tavex_data_to_results(results, tavex_products, equivalent_products)
+
     # Sort results by price per gram (ascending - lowest to highest)
     # Items without price per gram will be placed at the end
     results.sort(key=sort_key_function)
     
     logger.info(f"\nSorting {len(results)} products by price per gram (BGN)...")
 
+    # Define CSV fields based on whether we're comparing with Tavex
+    if args.compare_tavex:
+        keys = ['product_name','url','product_type','total_weight_g','purity_per_mille','fine_gold_g',
+                'price_bgn','price_eur','price_per_g_fine_bgn','price_per_g_fine_eur',
+                'buy_price_bgn','sell_price_bgn','spread_percentage',
+                'tavex_buy_price_bgn','tavex_sell_price_bgn','tavex_spread_percentage','is_cheaper','tavex_product_name']
+        base_fname = 'igold_tavex_gold_products_sorted'
+    else:
+        keys = ['product_name','url','product_type','total_weight_g','purity_per_mille','fine_gold_g',
+                'price_bgn','price_eur','price_per_g_fine_bgn','price_per_g_fine_eur',
+                'buy_price_bgn','sell_price_bgn','spread_percentage']
+        base_fname = 'igold_gold_products_sorted'
+        
+    if args.add_timestamp:
+        from datetime import datetime
+        timestamp = datetime.now().strftime('%d%m%y%H%M')
+        fname = f"{base_fname}_{timestamp}.csv"
+    else:
+        fname = f"{base_fname}.csv"
+
     # Write CSV
-    fname = 'igold_gold_products_sorted.csv'
-    keys = ['product_name','url','product_type','total_weight_g','purity_per_mille','fine_gold_g',
-            'price_bgn','price_eur','price_per_g_fine_bgn','price_per_g_fine_eur',
-            'buy_price_bgn','sell_price_bgn','spread_percentage']
-    
     with open(fname, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.DictWriter(f, fieldnames=keys, delimiter=';')
         writer.writeheader()
@@ -682,7 +826,35 @@ def main():
     
     logger.info(f"Products with prices: {len(with_prices)}/{len(results)}")
     logger.info(f"Products with price per gram: {len(with_price_per_gram)}/{len(results)}")
-    
+
+    # If comparing with Tavex, show comparison statistics
+    if args.compare_tavex:
+        with_tavex_match = [r for r in results if r.get('tavex_sell_price_bgn') is not None]
+        cheaper_than_tavex = [r for r in with_tavex_match if r.get('is_cheaper') == "YES"]
+
+        logger.info(f"\n=== TAVEX COMPARISON SUMMARY ===")
+        logger.info(f"Products with Tavex match: {len(with_tavex_match)}/{len(results)}")
+        logger.info(f"Products cheaper at igold: {len(cheaper_than_tavex)}/{len(with_tavex_match)}")
+
+        if cheaper_than_tavex:
+            logger.info(f"\n=== TOP 10 BETTER DEALS AT IGOLD ===")
+            # Sort by price difference percentage (biggest savings first)
+            better_deals = []
+            for item in cheaper_than_tavex:
+                if item.get('sell_price_bgn') and item.get('tavex_sell_price_bgn'):
+                    saving = (item['tavex_sell_price_bgn'] - item['sell_price_bgn']) / item['tavex_sell_price_bgn'] * 100
+                    better_deals.append((item, saving))
+
+            better_deals.sort(key=lambda x: x[1], reverse=True)
+
+            for i, (item, saving) in enumerate(better_deals[:10]):
+                name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
+                logger.info(f"{i+1}. {name} ({item['product_type']})")
+                logger.info(f"   igold price: {item['sell_price_bgn']} BGN")
+                logger.info(f"   Tavex price: {item['tavex_sell_price_bgn']} BGN")
+                logger.info(f"   Savings: {saving:.2f}%")
+                logger.info("")
+
     # Show top 5 cheapest per gram and most expensive per gram
     if with_price_per_gram:
         logger.info(f"\n=== TOP 10 CHEAPEST PER GRAM (BGN) ===")
@@ -751,6 +923,33 @@ def main():
             logger.info(f"   Buy price: {item['buy_price_bgn']} BGN")
             logger.info(f"   Sell price: {item['sell_price_bgn']} BGN")
             logger.info("")
+
+        # If comparing with Tavex, show spread comparison
+        if args.compare_tavex:
+            with_both_spreads = [r for r in results if r.get('spread_percentage') is not None and r.get('tavex_spread_percentage') is not None]
+            better_spread_than_tavex = [r for r in with_both_spreads if r['spread_percentage'] < r['tavex_spread_percentage']]
+
+            logger.info(f"\n=== SPREAD COMPARISON WITH TAVEX ===")
+            logger.info(f"Products with both spreads: {len(with_both_spreads)}")
+            logger.info(f"Products with better spread at igold: {len(better_spread_than_tavex)}/{len(with_both_spreads)}")
+
+            if better_spread_than_tavex:
+                logger.info(f"\n=== TOP 5 BETTER SPREADS AT IGOLD ===")
+                # Sort by spread difference (biggest difference first)
+                better_spreads = []
+                for item in better_spread_than_tavex:
+                    spread_diff = item['tavex_spread_percentage'] - item['spread_percentage']
+                    better_spreads.append((item, spread_diff))
+
+                better_spreads.sort(key=lambda x: x[1], reverse=True)
+
+                for i, (item, spread_diff) in enumerate(better_spreads[:5]):
+                    name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
+                    logger.info(f"{i+1}. {name} ({item['product_type']})")
+                    logger.info(f"   igold spread: {item['spread_percentage']}%")
+                    logger.info(f"   Tavex spread: {item['tavex_spread_percentage']}%")
+                    logger.info(f"   Difference: {spread_diff:.2f}%")
+                    logger.info("")
 
 if __name__ == '__main__':
     main()
