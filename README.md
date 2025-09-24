@@ -1,12 +1,12 @@
-# igold.bg Gold Scraper (Coins & Bars)
+# igold.bg Gold & Silver Scraper (Coins & Bars)
 
-A comprehensive Python scraper for [igold.bg](https://igold.bg), extracting product details for **investment gold coins** and **gold bars**.  
-The script gathers product information, detects product type, and generates a **CSV report sorted by the lowest price per gram of fine gold**.
+A comprehensive Python scraper for [igold.bg](https://igold.bg), extracting product details for **investment gold coins**, **gold bars**, **silver coins**, and **silver bars**.  
+The script gathers product information, detects product type, and generates a **CSV report sorted by the lowest price per gram of fine gold/silver**.
 
 ---
 
 ## ✨ Features
-- Scrapes **all major categories** of gold bars and coins.
+- Scrapes **all major categories** of gold and silver bars and coins.
 - Detects **product type** (bar / coin) via:
   - URL patterns
   - Title keywords
@@ -15,18 +15,18 @@ The script gathers product information, detects product type, and generates a **
   - Product name & URL  
   - Weight (g)  
   - Purity (per mille)  
-  - Fine gold weight (g)  
+  - Fine gold/silver weight (g)  
   - Prices in **BGN** and **EUR** (if available)  
   - Buy/Sell prices (if listed)  
-  - Computed **price per gram of fine gold**
+  - Computed **price per gram of fine gold/silver**
   - **Spread percentage** - dealer markup calculated as `((sell_price - buy_price) / sell_price) × 100`
 - Handles **multiple formats** of weight, purity, and price parsing.
-- Exports results as `igold_gold_products_sorted.csv`, sorted by **cheapest per gram**.
+- Exports results as `igold_gold_products_sorted.csv` or `igold_silver_products_sorted.csv`, sorted by **cheapest per gram**.
 - Displays summaries:
   - Top cheapest / most expensive products
   - Breakdown by bars vs coins
 - **NEW!** Compares prices with [tavex.bg](https://tavex.bg) to find the best deals
-  - Use `--compare-tavex` flag to enable comparison
+  - Use `--compare-tavex` flag to enable comparison (gold only)
   - Shows which products are cheaper at igold.bg
   - Adds columns for tavex prices and spread to the CSV
   - Uses a mapping in `equivalent_products.json` to match products
@@ -100,26 +100,37 @@ Once your venv is active, run:
 
 pip install -r requirements.txt
 
-4. Run the scraper
+4. Run the scrapers
+
+# Gold scraper
 python igold_scraper.py
 
-# To enable Tavex price comparison:
+# Silver scraper
+python igold_silver_scraper.py
+
+# To enable Tavex price comparison (gold only):
 python igold_scraper.py --compare-tavex
 
 # To add timestamp to the output file:
 python igold_scraper.py --add-timestamp
+python igold_silver_scraper.py --add-timestamp
 
-# To use both options:
+# To use both options (gold only):
 python igold_scraper.py --compare-tavex --add-timestamp
-
 
 The results will be saved in:
 
+# Gold results
 igold_gold_products_sorted.csv
 # or when comparing with Tavex:
 igold_tavex_gold_products_sorted.csv
 # or with timestamp (format: ddmmyyhhmm):
 igold_gold_products_sorted_170920252140.csv
+
+# Silver results
+igold_silver_products_sorted.csv
+# or with timestamp:
+igold_silver_products_sorted_170920252140.csv
 ```
 
 ## 📋 Command-Line Arguments
@@ -131,10 +142,19 @@ The script supports the following command-line arguments:
 | `--compare-tavex` | Enables comparison with Tavex prices. Adds columns for Tavex prices, spread, and indicates if the product is cheaper at igold.bg | `python igold_scraper.py --compare-tavex` |
 | `--add-timestamp` | Adds a timestamp to the output file name in the format ddmmyyhhmm (day, month, year, hour, minute) | `python igold_scraper.py --add-timestamp` |
 
+### Silver Scraper (`igold_silver_scraper.py`)
+
+| Argument | Description | Example |
+|----------|-------------|---------|
+| `--add-timestamp` | Adds a timestamp to the output file name in the format ddmmyyhhmm (day, month, year, hour, minute) | `python igold_silver_scraper.py --add-timestamp` |
+
 You can combine multiple arguments as needed:
 ```bash
 python igold_scraper.py --compare-tavex --add-timestamp
 ```
+
+# Silver with timestamp
+python igold_silver_scraper.py --add-timestamp
 
 ## ⚠️ Notes
 
@@ -142,8 +162,8 @@ The scraper introduces random delays between requests to avoid overloading the s
 
 The site structure may change, requiring regex/pattern updates.
 
-## The script is for educational and personal use only.
-## Please check igold.bg’s and tavex.bg's Terms of Service before heavy use.
+## The scripts are for educational and personal use only.
+## Please check igold.bg's and tavex.bg's Terms of Service before heavy use.
 
 ## 📜 License
 
