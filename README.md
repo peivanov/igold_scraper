@@ -25,6 +25,11 @@ The script gathers product information, detects product type, and generates a **
 - Displays summaries:
   - Top cheapest / most expensive products
   - Breakdown by bars vs coins
+- **NEW!** Compares prices with [tavex.bg](https://tavex.bg) to find the best deals
+  - Use `--compare-tavex` flag to enable comparison
+  - Shows which products are cheaper at igold.bg
+  - Adds columns for tavex prices and spread to the CSV
+  - Uses a mapping in `equivalent_products.json` to match products
 
 ---
 
@@ -47,6 +52,13 @@ Spread % = ((Sell Price - Buy Price) / Sell Price) × 100
 - **1oz investment bars/coins**: 0.5% - 2%
 - **Smaller bars/coins**: 1% - 5%
 - **Collectible/numismatic items**: 5% - 30%
+
+### Dealer Comparison
+With the `--compare-tavex` flag, the scraper compares spreads between igold.bg and tavex.bg:
+- Shows which dealer offers the lower spread for each product
+- Calculates the spread difference
+- Identifies overall which dealer has better pricing
+- Helps find the best value for both buying and selling gold
 
 ---
 
@@ -91,10 +103,37 @@ pip install -r requirements.txt
 4. Run the scraper
 python igold_scraper.py
 
+# To enable Tavex price comparison:
+python igold_scraper.py --compare-tavex
+
+# To add timestamp to the output file:
+python igold_scraper.py --add-timestamp
+
+# To use both options:
+python igold_scraper.py --compare-tavex --add-timestamp
+
 
 The results will be saved in:
 
 igold_gold_products_sorted.csv
+# or when comparing with Tavex:
+igold_tavex_gold_products_sorted.csv
+# or with timestamp (format: ddmmyyhhmm):
+igold_gold_products_sorted_170920252140.csv
+```
+
+## 📋 Command-Line Arguments
+
+The script supports the following command-line arguments:
+
+| Argument | Description | Example |
+|----------|-------------|---------|
+| `--compare-tavex` | Enables comparison with Tavex prices. Adds columns for Tavex prices, spread, and indicates if the product is cheaper at igold.bg | `python igold_scraper.py --compare-tavex` |
+| `--add-timestamp` | Adds a timestamp to the output file name in the format ddmmyyhhmm (day, month, year, hour, minute) | `python igold_scraper.py --add-timestamp` |
+
+You can combine multiple arguments as needed:
+```bash
+python igold_scraper.py --compare-tavex --add-timestamp
 ```
 
 ## ⚠️ Notes
@@ -104,7 +143,7 @@ The scraper introduces random delays between requests to avoid overloading the s
 The site structure may change, requiring regex/pattern updates.
 
 ## The script is for educational and personal use only.
-## Please check igold.bg’s Terms of Service before heavy use.
+## Please check igold.bg’s and tavex.bg's Terms of Service before heavy use.
 
 ## 📜 License
 
