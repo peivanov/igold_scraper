@@ -6,6 +6,10 @@ on:
     - cron: '0 8 * * 0'
   workflow_dispatch:
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   generate-statistics:
     runs-on: ubuntu-latest
@@ -14,6 +18,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
         
     - name: Set up Python
@@ -26,25 +31,51 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         
+    - name: Create directories
+      run: |
+        mkdir -p data/gold
+        mkdir -p data/silver
+        mkdir -p data/statistics
+        
     - name: Generate weekly statistics
       env:
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       run: |
-        python scripts/statistics_generator.py --period weekly
+        if [ -f "scripts/statistics_generator.py" ]; then
+          python scripts/statistics_generator.py --period weekly
+        else
+          echo "Statistics generator script not found"
+        fi
         
-    - name: Generate monthly statistics (on first Sunday of month)
+    - name: Generate monthly statistics (first Sunday of month)
       env:
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       run: |
-        python scripts/statistics_generator.py --period monthly
-      if: ${{ github.event.schedule == '0 8 * * 0' && format('{0}', github.run_number) <= '7' }}
+        if [ -f "scripts/statistics_generator.py" ]; then
+          # Check if it's the first Sunday of the month
+          day_of_month=$(date +%d)
+          if [ "$day_of_month" -le 7 ]; then
+            python scripts/statistics_generator.py --period monthly
+          else
+            echo "Not the first Sunday of the month, skipping monthly report"
+          fi
+        else
+          echo "Statistics generator script not found"
+        fi
       
     - name: Commit statistics
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add data/statistics/
+        
+        if [ -d "data/statistics" ]; then
+          git add data/statistics/
+        fi
+        
         if [ -n "$(git status --porcelain)" ]; then
-          git commit -m "Weekly statistics report - $(date '+%Y-%m-%d')"
+          git commit -m "Weekly statistics report - $(date '+%Y-%m-%d %H:%M UTC')"
           git push
+          echo "Successfully pushed statistics"
+        else
+          echo "No statistics to commit"
         fi
