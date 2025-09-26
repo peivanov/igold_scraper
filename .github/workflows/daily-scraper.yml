@@ -6,6 +6,10 @@ on:
     - cron: '0 6 * * *'
   workflow_dispatch: # Allow manual triggering
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   scrape-and-analyze:
     runs-on: ubuntu-latest
@@ -14,6 +18,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
         
     - name: Set up Python
@@ -31,46 +36,69 @@ jobs:
         mkdir -p data/gold
         mkdir -p data/silver
         mkdir -p data/statistics
+        mkdir -p scripts
         
     - name: Run Gold Scraper
       id: gold-scraper
       run: |
         echo "Running gold scraper with Tavex comparison..."
-        python igold_scraper.py --compare-tavex --add-timestamp
-        echo "Gold scraping completed"
+        python igold_scraper.py --compare-tavex --add-timestamp || echo "Gold scraper failed but continuing..."
+        echo "Gold scraping step completed"
       continue-on-error: true
       
     - name: Run Silver Scraper
       id: silver-scraper
       run: |
         echo "Running silver scraper..."
-        python igold_silver_scraper.py --add-timestamp
-        echo "Silver scraping completed"
+        python igold_silver_scraper.py --add-timestamp || echo "Silver scraper failed but continuing..."
+        echo "Silver scraping step completed"
       continue-on-error: true
       
     - name: Convert CSV to JSON and organize data
       run: |
-        python scripts/data_manager.py
+        if [ -f "scripts/data_manager.py" ]; then
+          python scripts/data_manager.py
+        else
+          echo "Data manager script not found, skipping data organization"
+        fi
         
     - name: Analyze price changes and send notifications
       env:
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         PRICE_CHANGE_THRESHOLD: ${{ secrets.PRICE_CHANGE_THRESHOLD || '5.0' }}
       run: |
-        python scripts/price_tracker.py
+        if [ -f "scripts/price_tracker.py" ]; then
+          python scripts/price_tracker.py
+        else
+          echo "Price tracker script not found, skipping price analysis"
+        fi
         
-    - name: Clean up old data
+    - name: Clean up old data (if script exists)
       run: |
-        python scripts/data_manager.py --cleanup
+        if [ -f "scripts/data_manager.py" ]; then
+          python scripts/data_manager.py --cleanup
+        else
+          echo "Data manager script not found, skipping cleanup"
+        fi
         
     - name: Commit and push results
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add data/
+        
+        # Add any CSV files created by scrapers
+        git add *.csv 2>/dev/null || true
+        
+        # Add data directory if it exists
+        if [ -d "data" ]; then
+          git add data/
+        fi
+        
+        # Check if there are changes to commit
         if [ -n "$(git status --porcelain)" ]; then
-          git commit -m "Daily scraping results - $(date '+%Y-%m-%d')"
+          git commit -m "Daily scraping results - $(date '+%Y-%m-%d %H:%M UTC')"
           git push
+          echo "Successfully pushed scraping results"
         else
           echo "No changes to commit"
         fi
