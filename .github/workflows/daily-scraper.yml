@@ -1,0 +1,76 @@
+name: Daily Precious Metals Scraper
+
+on:
+  schedule:
+    # Run daily at 06:00 UTC (09:00 Bulgarian time)
+    - cron: '0 6 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  scrape-and-analyze:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Create data directories
+      run: |
+        mkdir -p data/gold
+        mkdir -p data/silver
+        mkdir -p data/statistics
+        
+    - name: Run Gold Scraper
+      id: gold-scraper
+      run: |
+        echo "Running gold scraper with Tavex comparison..."
+        python igold_scraper.py --compare-tavex --add-timestamp
+        echo "Gold scraping completed"
+      continue-on-error: true
+      
+    - name: Run Silver Scraper
+      id: silver-scraper
+      run: |
+        echo "Running silver scraper..."
+        python igold_silver_scraper.py --add-timestamp
+        echo "Silver scraping completed"
+      continue-on-error: true
+      
+    - name: Convert CSV to JSON and organize data
+      run: |
+        python scripts/data_manager.py
+        
+    - name: Analyze price changes and send notifications
+      env:
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        PRICE_CHANGE_THRESHOLD: ${{ secrets.PRICE_CHANGE_THRESHOLD || '5.0' }}
+      run: |
+        python scripts/price_tracker.py
+        
+    - name: Clean up old data
+      run: |
+        python scripts/data_manager.py --cleanup
+        
+    - name: Commit and push results
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/
+        if [ -n "$(git status --porcelain)" ]; then
+          git commit -m "Daily scraping results - $(date '+%Y-%m-%d')"
+          git push
+        else
+          echo "No changes to commit"
+        fi

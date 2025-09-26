@@ -3,6 +3,8 @@
 A comprehensive Python scraper for [igold.bg](https://igold.bg), extracting product details for **investment gold coins**, **gold bars**, **silver coins**, and **silver bars**.  
 The script gathers product information, detects product type, and generates a **CSV report sorted by the lowest price per gram of fine gold/silver**.
 
+**🤖 NEW: GitHub Actions Automation** - Automated daily scraping with price change tracking and Discord notifications!
+
 ---
 
 ## ✨ Features
@@ -33,12 +35,43 @@ The script gathers product information, detects product type, and generates a **
 
 ---
 
+## 🤖 GitHub Actions Automation
+
+### **Automated Daily Scraping & Price Tracking**
+- **📅 Daily Schedule**: Automatically runs at 6:00 AM UTC (9:00 AM Bulgarian time)
+- **📊 Price Change Detection**: Compares daily prices and identifies significant changes (>5% by default)
+- **🔔 Discord Notifications**: Rich notifications for price changes, new products, and market trends
+- **📈 Market Analysis**: Weekly and monthly statistical reports
+- **🗂️ Data Management**: 6-month historical data retention with automatic cleanup
+
+### **Discord Notifications Include:**
+- **Price Alerts**: Products with significant price changes (configurable threshold)
+- **New Products**: Newly detected items on igold.bg
+- **Market Reports**: Weekly trend analysis and best deals
+- **Error Notifications**: Alerts if scraping fails
+
+### **Setup Automation:**
+1. **Configure Discord Webhook**: 
+   - Go to repository Settings → Secrets → Add `DISCORD_WEBHOOK_URL`
+   - Optionally add `PRICE_CHANGE_THRESHOLD` (defaults to 5.0)
+
+2. **GitHub Actions will automatically**:
+   - Run scrapers daily
+   - Store data in `data/` directory
+   - Generate historical JSON files
+   - Send Discord notifications for changes
+   - Create weekly/monthly statistics
+
+3. **Manual Trigger**: Go to Actions tab → "Daily Precious Metals Scraper" → "Run workflow"
+
+---
+
 ## 📊 Spread Analysis
 
 The scraper now calculates the **spread percentage** for each product, which represents the dealer's markup between buy and sell prices. This helps identify:
 
 - **Investment efficiency**: Lower spreads mean better value for investors
-- **Product categories**: Gold bars typically have lower spreads than coins
+- **Product categories**: Gold and silver bars typically have lower spreads than coins
 - **Size premium**: Larger bars generally offer better spreads
 - **Collectible premium**: Numismatic items have higher spreads due to collector value
 
@@ -62,17 +95,17 @@ With the `--compare-tavex` flag, the scraper compares spreads between igold.bg a
 
 ---
 
-
 ## 🚀 Getting Started
 
+### Manual Usage
+
 ```bash
-### 1. Clone the repo
-git clone https://github.com:peivanov/igold_scraper.git
+# 1. Clone the repo
+git clone https://github.com/peivanov/igold_scraper.git
 cd igold_scraper
 
-2. Set up a virtual environment (Recommended)
-🔹 On Ubuntu / Linux
-# Install venv if missing
+# 2. Set up a virtual environment (Recommended)
+# On Ubuntu / Linux
 sudo apt update
 sudo apt install python3-venv -y
 
@@ -86,6 +119,7 @@ python -m venv venv
 
 # Activate (PowerShell)
 venv\Scripts\Activate.ps1
+# or: venv\Scripts\activate.bat
 
 # If blocked by execution policy, use instead:
 venv\Scripts\activate.bat
@@ -117,6 +151,7 @@ python igold_silver_scraper.py --add-timestamp
 
 # To use both options (gold only):
 python igold_scraper.py --compare-tavex --add-timestamp
+```
 
 The results will be saved in:
 
@@ -133,6 +168,17 @@ igold_silver_products_sorted.csv
 igold_silver_products_sorted_170920252140.csv
 ```
 
+### Automated Usage (GitHub Actions)
+
+1. **Fork/Clone** this repository
+2. **Add Discord webhook** to repository secrets (`DISCORD_WEBHOOK_URL`)
+3. **GitHub Actions will automatically**:
+   - Run daily at 6:00 AM UTC
+   - Store data in `data/` directory
+   - Send Discord notifications
+   - Generate weekly/monthly reports
+
+---
 ## 📋 Command-Line Arguments
 
 The script supports the following command-line arguments:
@@ -155,6 +201,53 @@ python igold_scraper.py --compare-tavex --add-timestamp
 
 # Silver with timestamp
 python igold_silver_scraper.py --add-timestamp
+```
+
+---
+
+## 📁 Data Structure (GitHub Actions)
+
+When using GitHub Actions automation, data is organized as:
+
+```
+data/
+├── gold/                    # Daily gold scraping results
+│   ├── 2025-01-15.json     # Gold products for specific date
+│   └── 2025-01-16.json
+├── silver/                  # Daily silver scraping results
+│   ├── 2025-01-15.json     # Silver products for specific date
+│   └── 2025-01-16.json
+└── statistics/              # Generated reports and analysis
+    ├── gold_weekly_2025-01-15.json
+    ├── silver_weekly_2025-01-15.json
+    └── gold_monthly_2025-01-15.json
+```
+
+**Data Retention**: 6 months of historical data with automatic cleanup.
+
+---
+
+## 📈 Market Analysis Features
+
+### **Daily Price Tracking**
+- Compares current prices with previous day
+- Identifies products with significant changes (>5% default)
+- Tracks new products and discontinued items
+
+### **Weekly/Monthly Reports**
+- Market trend analysis (increasing/decreasing/stable)
+- Price volatility calculations
+- Best deals identification
+- Product type breakdowns (bars vs coins)
+- Average price per gram tracking
+
+### **Discord Integration**
+- Rich embed notifications with product links
+- Real-time price change alerts
+- Weekly market summaries
+- Error notifications for failed runs
+
+---
 
 ## ⚠️ Notes
 

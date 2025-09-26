@@ -1,0 +1,50 @@
+name: Weekly Statistics Report
+
+on:
+  schedule:
+    # Run every Sunday at 08:00 UTC
+    - cron: '0 8 * * 0'
+  workflow_dispatch:
+
+jobs:
+  generate-statistics:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Generate weekly statistics
+      env:
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      run: |
+        python scripts/statistics_generator.py --period weekly
+        
+    - name: Generate monthly statistics (on first Sunday of month)
+      env:
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      run: |
+        python scripts/statistics_generator.py --period monthly
+      if: ${{ github.event.schedule == '0 8 * * 0' && format('{0}', github.run_number) <= '7' }}
+      
+    - name: Commit statistics
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/statistics/
+        if [ -n "$(git status --porcelain)" ]; then
+          git commit -m "Weekly statistics report - $(date '+%Y-%m-%d')"
+          git push
+        fi
