@@ -1,3 +1,5 @@
+[![Daily Precious Metals Scraper](https://github.com/peivanov/igold_scraper/actions/workflows/daily-scraper.yml/badge.svg)](https://github.com/peivanov/igold_scraper/actions/workflows/daily-scraper.yml)
+
 # igold.bg Gold & Silver Scraper (Coins & Bars)
 
 A comprehensive Python scraper for [igold.bg](https://igold.bg), extracting product details for **investment gold coins**, **gold bars**, **silver coins**, and **silver bars**.  
