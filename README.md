@@ -18,8 +18,9 @@ Automated scraper for [igold.bg](https://igold.bg) precious metals with live mar
 - **Daily automated scraping** - GitHub Actions runs at 6:00 AM UTC (9:00 AM Bulgarian time)
 - **Live spot prices** - Real-time XAU/EUR and XAG/EUR market data
 - **Price tracking** - Top 10 products by price per fine gram with change detection (>5% threshold)
-- **Discord notifications** - Daily updates with price changes and live market prices
-- **Market statistics** - Weekly/monthly trend analysis and volatility tracking
+- **Daily market reports** - Day-over-day analysis of top 10 products with trend detection
+- **Weekly/monthly statistics** - Comprehensive market trend analysis and volatility tracking
+- **Discord notifications** - Automated reports for price changes, daily summaries, and periodic statistics
 - **Historical data** - 6-month retention with automatic cleanup
 
 ## Setup

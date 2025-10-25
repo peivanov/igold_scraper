@@ -85,6 +85,16 @@ jobs:
         else
           echo "Price tracker script not found, skipping price analysis"
         fi
+    
+    - name: Generate and send daily market reports
+      env:
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      run: |
+        if [ -f "scripts/daily_report_generator.py" ]; then
+          python scripts/daily_report_generator.py
+        else
+          echo "Daily report generator script not found, skipping daily reports"
+        fi
         
     - name: Clean up old data (if script exists)
       run: |
