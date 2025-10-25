@@ -20,10 +20,19 @@ class StatisticsGenerator:
     def __init__(self, webhook_url: str = None):
         self.webhook_url = webhook_url
     
-    def get_top_products(self, products: List[Dict], top_n: int = 10) -> List[Dict]:
+    def get_top_products(self, products: List[Dict], top_n: int = 10, metal_type: str = None) -> List[Dict]:
         """Get top N products with best price per fine gram (excludes Tavex fields)"""
-        # Filter products with valid prices
-        valid_products = [p for p in products if p.get('price_per_g_fine_bgn')]
+        # Filter products with valid prices AND available for sale (sell_price > 0)
+        valid_products = [p for p in products 
+                         if p.get('price_per_g_fine_bgn') 
+                         and p.get('sell_price_bgn') 
+                         and p.get('sell_price_bgn') != 0
+                         and p.get('sell_price_bgn') != '']
+        
+        # Additional filter: ensure products match the expected metal type
+        if metal_type:
+            metal_field = f'fine_{metal_type}_g'
+            valid_products = [p for p in valid_products if p.get(metal_field)]
         
         # Sort by price per gram (ascending - best prices first)
         sorted_products = sorted(valid_products, key=lambda x: x.get('price_per_g_fine_bgn', float('inf')))
@@ -75,7 +84,7 @@ class StatisticsGenerator:
         
         return prices
     
-    def calculate_market_statistics(self, historical_data: List[Dict], live_prices: List[Dict] = None) -> Dict:
+    def calculate_market_statistics(self, historical_data: List[Dict], live_prices: List[Dict] = None, metal_type: str = 'gold') -> Dict:
         """Calculate market statistics from historical data - focusing on top 10 products"""
         if not historical_data:
             return {}
@@ -99,8 +108,8 @@ class StatisticsGenerator:
         for day_data in historical_data:
             products = day_data.get('products', [])
             
-            # Get top 10 for this day
-            top_10 = self.get_top_products(products, top_n=10)
+            # Get top 10 for this day - filter by metal type
+            top_10 = self.get_top_products(products, top_n=10, metal_type=metal_type)
             
             if not top_10:
                 continue
@@ -189,10 +198,10 @@ class StatisticsGenerator:
                 # Add metal type for reference
                 stats['live_price_metal'] = live_prices[0].get('metal_name', 'unknown')
         
-        # Get cheapest products from latest data (top 10 only)
+        # Get cheapest products from latest data (top 10 only, filtered by metal type)
         if historical_data:
             latest_products = historical_data[0].get('products', [])
-            top_10_latest = self.get_top_products(latest_products, top_n=10)
+            top_10_latest = self.get_top_products(latest_products, top_n=10, metal_type=metal_type)
             
             # Already sorted by price, so first 5 are cheapest
             stats['cheapest_products'] = top_10_latest[:5]
@@ -220,7 +229,7 @@ class StatisticsGenerator:
             if live_prices:
                 logger.info(f"Loaded {len(live_prices)} days of live {metal_type} prices")
             
-            stats = self.calculate_market_statistics(historical_data, live_prices)
+            stats = self.calculate_market_statistics(historical_data, live_prices, metal_type)
             
             report = {
                 'report_type': period,

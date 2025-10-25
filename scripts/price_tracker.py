@@ -48,25 +48,34 @@ class PriceTracker:
                 logger.error(f"Error loading {file_path}: {e}")
         return None
     
-    def get_top_products(self, products: List[Dict], top_n: int = 10) -> List[Dict]:
+    def get_top_products(self, products: List[Dict], top_n: int = 10, metal_type: str = None) -> List[Dict]:
         """Get top N products with best price per fine gram"""
-        # Filter products with valid prices
-        valid_products = [p for p in products if p.get('price_per_g_fine_bgn')]
+        # Filter products with valid prices AND available for sale (sell_price > 0)
+        valid_products = [p for p in products 
+                         if p.get('price_per_g_fine_bgn')
+                         and p.get('sell_price_bgn')
+                         and p.get('sell_price_bgn') != 0
+                         and p.get('sell_price_bgn') != '']
+        
+        # Additional filter: ensure products match the expected metal type
+        if metal_type:
+            metal_field = f'fine_{metal_type}_g'
+            valid_products = [p for p in valid_products if p.get(metal_field)]
         
         # Sort by price per gram (ascending - best prices first)
         sorted_products = sorted(valid_products, key=lambda x: x.get('price_per_g_fine_bgn', float('inf')))
         
         return sorted_products[:top_n]
     
-    def compare_prices(self, today_data: Dict, yesterday_data: Dict) -> List[Dict]:
+    def compare_prices(self, today_data: Dict, yesterday_data: Dict, metal_type: str = 'gold') -> List[Dict]:
         """Compare prices between two datasets - only for top 10 products with best price per fine gram"""
         changes = []
         
         if not today_data or not yesterday_data:
             return changes
         
-        # Get top 10 products from today with best prices
-        today_top_products = self.get_top_products(today_data.get('products', []), top_n=10)
+        # Get top 10 products from today with best prices (filtered by metal type)
+        today_top_products = self.get_top_products(today_data.get('products', []), top_n=10, metal_type=metal_type)
         
         # Create lookup dictionaries
         today_products = {p.get('product_name', ''): p for p in today_top_products}
@@ -302,7 +311,7 @@ def main():
             logger.info(f"No {metal_type} data found for yesterday ({yesterday}), skipping comparison")
             continue
         
-        changes = tracker.compare_prices(today_data, yesterday_data)
+        changes = tracker.compare_prices(today_data, yesterday_data, metal_type)
         
         if changes:
             logger.info(f"Found {len(changes)} significant {metal_type} changes")
