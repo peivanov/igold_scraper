@@ -174,18 +174,19 @@ class DailyReportGenerator:
         else:
             change_emoji = '➡️'
         
-        # Build best deals list (top 5 for Discord to keep message short)
+        # Build best deals list (top 10)
         best_deals_text = ""
-        for i, product in enumerate(stats['best_deals'][:5], 1):
+        for i, product in enumerate(stats['best_deals'][:10], 1):
             name = product['product_name'][:60]
             price_per_g = product['price_per_g_fine_bgn']
             sell_price = product.get('sell_price_bgn', 0)
             url = product.get('url', '')
             
-            best_deals_text += f"{i}. **{name}**\n"
-            best_deals_text += f"   {price_per_g:.2f} BGN/g | Total: {sell_price:.0f} BGN\n"
+            best_deals_text += f"{i}. **{name}** - {price_per_g:.2f} BGN/g"
+            if sell_price:
+                best_deals_text += f" | Total: {sell_price:.0f} BGN"
             if url:
-                best_deals_text += f"   [View Product]({url})\n"
+                best_deals_text += f" | [View]({url})"
             best_deals_text += "\n"
         
         # Build embed fields
@@ -199,16 +200,13 @@ class DailyReportGenerator:
                 "name": "Avg Price/gram (Top 10)",
                 "value": f"{stats['average_price_per_gram']} BGN",
                 "inline": True
-            }
-        ]
-        
-        # Add price change if available
-        if stats['yesterday_average']:
-            fields.append({
+            },
+            {
                 "name": "Daily Change",
                 "value": f"{change_emoji} {stats['price_change_pct']:+.2f}%",
                 "inline": True
-            })
+            }
+        ]
         
         fields.extend([
             {
@@ -246,7 +244,7 @@ class DailyReportGenerator:
         # Add best deals
         if best_deals_text:
             fields.append({
-                "name": "🏆 Top 5 Best Deals",
+                "name": "🏆 Top 10 Best Deals",
                 "value": best_deals_text,
                 "inline": False
             })
