@@ -1,0 +1,72 @@
+{
+  "type": "daily_digest",
+  "date": "2025-09-29",
+  "timestamp": "2025-09-29T00:30:05.478520",
+  "metals": {
+    "gold": {
+      "market_summary": {
+        "total_products": 50,
+        "products_with_prices": 50,
+        "avg_price_per_g": 215.11466666666666,
+        "cheapest_price": 209.1,
+        "most_expensive_price": 343.57,
+        "price_range": 134.47,
+        "top_15_avg_note": "Average calculated from top 15 best-priced products",
+        "product_types": {
+          "coin": 49,
+          "bar": 1
+        },
+        "daily_change": {
+          "price_change_pct": -28.960173531234812,
+          "product_count_change": -129,
+          "yesterday_avg": 302.80854748603355
+        }
+      },
+      "notable_changes": [],
+      "sentiment": "bearish",
+      "sentiment_summary": "Negative sentiment with downward pressure. Caution advised for new positions.",
+      "top_products_by_category": {
+        "bars": [
+          {
+            "name": "1 гр. Златно Кюлче Valcambi CombiBar Швейцария",
+            "price_per_g": 214.0,
+            "total_price_bgn": 214.0,
+            "type": "bar",
+            "url": "https://igold.bg/1-g-combibar-valcambi",
+            "weight_g": 1.0
+          }
+        ],
+        "coins": [
+          {
+            "name": "31.1 гр. ( 1 toz. ) Златна Монета Британия",
+            "price_per_g": 209.1,
+            "total_price_bgn": 6503.0,
+            "type": "coin",
+            "url": "https://igold.bg/1-oz-zlatna-moneta-britania-2022",
+            "weight_g": 31.1
+          },
+          {
+            "name": "6.45 гр. Златна Монета 20 Френски Франка Мариана 1...",
+            "price_per_g": 212.05,
+            "total_price_bgn": 1232.0,
+            "type": "coin",
+            "url": "https://igold.bg/20-zlatni-franka-mariana",
+            "weight_g": 5.81
+          },
+          {
+            "name": "6.45 гр. Златна Монета 20 Швейцарски Франка Вренел...",
+            "price_per_g": 212.05,
+            "total_price_bgn": 1232.0,
+            "type": "coin",
+            "url": "https://igold.bg/20-zlatni-franka-vreneli",
+            "weight_g": 5.81
+          }
+        ]
+      },
+      "live_market_price": null
+    },
+    "silver": {
+      "error": "no_data_today"
+    }
+  }
+}

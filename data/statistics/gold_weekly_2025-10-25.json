@@ -1,0 +1,132 @@
+{
+  "report_type": "weekly",
+  "metal_type": "gold",
+  "report_date": "2025-10-25",
+  "period_start": "2025-10-19",
+  "period_end": "2025-10-25",
+  "statistics": {
+    "period_days": 5,
+    "unique_products_in_top_10": 14,
+    "average_price_per_gram": 233.7722,
+    "price_volatility": 5.057554517748669,
+    "price_trend": "decreasing",
+    "cheapest_products": [
+      {
+        "product_name": "33.87 гр. Златна Монета 100 Корони Франц- Йосиф I Австрия 1915",
+        "url": "https://igold.bg/zlatna-moneta-100-koroni-avstria",
+        "product_type": "coin",
+        "total_weight_g": 33.87,
+        "purity_per_mille": 900.0,
+        "fine_gold_g": 30.49,
+        "price_bgn": 6915.0,
+        "price_eur": 3535.58,
+        "price_per_g_fine_bgn": 226.8,
+        "price_per_g_fine_eur": 115.96,
+        "buy_price_bgn": 6915.0,
+        "sell_price_bgn": 0.0,
+        "spread_percentage": ""
+      },
+      {
+        "product_name": "100 гр. Златно Кюлче Argor-Heraeus Швейцария Холограмна Защита",
+        "url": "https://igold.bg/zlatno-kyulche-100-g-argor-heraeus-kinebar",
+        "product_type": "bar",
+        "total_weight_g": 100.0,
+        "purity_per_mille": 999.9,
+        "fine_gold_g": 100.0,
+        "price_bgn": 22799.0,
+        "price_eur": 11656.94,
+        "price_per_g_fine_bgn": 227.99,
+        "price_per_g_fine_eur": 116.57,
+        "buy_price_bgn": 22370.0,
+        "sell_price_bgn": 22799.0,
+        "spread_percentage": 1.88
+      },
+      {
+        "product_name": "100 гр. Златно Кюлче Valcambi Швейцария",
+        "url": "https://igold.bg/zlatno-kyulche-valcambi-100-g",
+        "product_type": "bar",
+        "total_weight_g": 100.0,
+        "purity_per_mille": 999.9,
+        "fine_gold_g": 100.0,
+        "price_bgn": 22799.0,
+        "price_eur": 11656.94,
+        "price_per_g_fine_bgn": 227.99,
+        "price_per_g_fine_eur": 116.57,
+        "buy_price_bgn": 22370.0,
+        "sell_price_bgn": 22799.0,
+        "spread_percentage": 1.88
+      },
+      {
+        "product_name": "7.21 гр. Златна Монета 100 Турски Куруша Ататюрк 1923",
+        "url": "https://igold.bg/100-zlatni-kurusha-atatyurk-1923",
+        "product_type": "coin",
+        "total_weight_g": 7.21,
+        "purity_per_mille": 917.0,
+        "fine_gold_g": 6.61,
+        "price_bgn": 1521.0,
+        "price_eur": 777.67,
+        "price_per_g_fine_bgn": 230.11,
+        "price_per_g_fine_eur": 117.65,
+        "buy_price_bgn": 1521.0,
+        "sell_price_bgn": 0.0,
+        "spread_percentage": ""
+      },
+      {
+        "product_name": "6.45 гр. Златна Монета 20 Италиански Лири Умберто I 1879- 1897",
+        "url": "https://igold.bg/20-zlatni-liri-umberto-i",
+        "product_type": "coin",
+        "total_weight_g": 6.45,
+        "purity_per_mille": 900.0,
+        "fine_gold_g": 5.81,
+        "price_bgn": 1337.0,
+        "price_eur": 683.6,
+        "price_per_g_fine_bgn": 230.12,
+        "price_per_g_fine_eur": 117.66,
+        "buy_price_bgn": 1337.0,
+        "sell_price_bgn": 0.0,
+        "spread_percentage": ""
+      }
+    ],
+    "product_type_breakdown": {
+      "bars": 21,
+      "coins": 29
+    },
+    "daily_top_10_averages": [
+      {
+        "date": "2025-10-25",
+        "average_price": 229.45600000000002,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-10-23",
+        "average_price": 230.402,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-10-22",
+        "average_price": 231.067,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-10-21",
+        "average_price": 241.315,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-10-19",
+        "average_price": 236.621,
+        "top_10_count": 10
+      }
+    ],
+    "trend_percentage": -3.028049074257987,
+    "live_prices": [
+      {
+        "date": "2025-10-25",
+        "price": 222.45
+      }
+    ],
+    "current_live_price_bgn_g": 222.45,
+    "live_price_metal": "gold"
+  },
+  "data_points": 5
+}
