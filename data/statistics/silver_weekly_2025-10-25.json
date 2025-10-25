@@ -1,0 +1,47 @@
+{
+  "report_type": "weekly",
+  "metal_type": "silver",
+  "report_date": "2025-10-25",
+  "period_start": "2025-10-19",
+  "period_end": "2025-10-25",
+  "statistics": {
+    "period_days": 2,
+    "unique_products_in_top_10": 0,
+    "average_price_per_gram": 0,
+    "price_volatility": 0,
+    "price_trend": "stable",
+    "cheapest_products": [],
+    "product_type_breakdown": {
+      "bars": 0,
+      "coins": 0
+    },
+    "daily_top_10_averages": [],
+    "live_prices": [
+      {
+        "date": "2025-10-25",
+        "price": 2.63
+      },
+      {
+        "date": "2025-10-23",
+        "price": 2.63
+      },
+      {
+        "date": "2025-10-22",
+        "price": 2.64
+      },
+      {
+        "date": "2025-10-21",
+        "price": 2.65
+      },
+      {
+        "date": "2025-10-19",
+        "price": 2.68
+      }
+    ],
+    "live_price_trend_percentage": -1.8656716417910546,
+    "live_price_trend": "stable",
+    "current_live_price_bgn_g": 2.63,
+    "live_price_metal": "silver"
+  },
+  "data_points": 2
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "timestamp": "2025-10-23T06:00:00.000000",
+    "date": "2025-10-23",
+    "metal": "XAG",
+    "metal_name": "silver",
+    "source": "Live XAG/EUR Market Data",
+    "platform": "MarketData",
+    "spread_profile": "standard",
+    "prices": {
+      "eur_per_oz": {
+        "bid": 41.83,
+        "ask": 42.03,
+        "mid": 41.93,
+        "spread": 0.7
+      },
+      "eur_per_gram": {
+        "bid": 1.34,
+        "ask": 1.35,
+        "mid": 1.34
+      },
+      "bgn_per_gram": {
+        "bid": 2.62,
+        "ask": 2.64,
+        "mid": 2.63
+      }
+    },
+    "eur_to_bgn_rate": 1.9558
+  }
+]

@@ -36,7 +36,20 @@ jobs:
         mkdir -p data/gold
         mkdir -p data/silver
         mkdir -p data/statistics
+        mkdir -p data/live_prices/gold
+        mkdir -p data/live_prices/silver
         mkdir -p scripts
+        
+    - name: Fetch live precious metals prices
+      env:
+        PRECIOUS_METALS_API_BASE: ${{ secrets.PRECIOUS_METALS_API_BASE }}
+      run: |
+        if [ -f "scripts/live_gold_price.py" ]; then
+          python scripts/live_gold_price.py --metals XAU XAG
+        else
+          echo "Live price script not found, skipping"
+        fi
+      continue-on-error: true
         
     - name: Run Gold Scraper
       id: gold-scraper
@@ -71,6 +84,16 @@ jobs:
           python scripts/price_tracker.py
         else
           echo "Price tracker script not found, skipping price analysis"
+        fi
+    
+    - name: Generate and send daily market reports
+      env:
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      run: |
+        if [ -f "scripts/daily_report_generator.py" ]; then
+          python scripts/daily_report_generator.py
+        else
+          echo "Daily report generator script not found, skipping daily reports"
         fi
         
     - name: Clean up old data (if script exists)

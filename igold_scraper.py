@@ -752,11 +752,6 @@ def main():
         logger.error("No product links found. The site structure might have changed.")
         return
     
-    # Show first few links for debugging
-    logger.info("First 5 links found:")
-    for i, link in enumerate(links[:5]):
-        logger.info(f"{i+1}. {link}")
-    
     results = []
     failed_count = 0
     
