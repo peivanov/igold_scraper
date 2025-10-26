@@ -93,14 +93,14 @@ class DailyReportGenerator:
         """Calculate daily market statistics"""
         
         today_products = today_data.get('products', [])
-        today_top_10 = self.get_top_products(today_products, top_n=10, metal_type=metal_type)
+        today_top_5 = self.get_top_products(today_products, top_n=5, metal_type=metal_type)
         
         # Calculate today's metrics
-        today_avg = sum(p['price_per_g_fine_bgn'] for p in today_top_10) / len(today_top_10) if today_top_10 else 0
+        today_avg = sum(p['price_per_g_fine_bgn'] for p in today_top_5) / len(today_top_5) if today_top_5 else 0
         
         # Product type breakdown
-        bars_count = sum(1 for p in today_top_10 if p.get('product_type') == 'bar')
-        coins_count = sum(1 for p in today_top_10 if p.get('product_type') == 'coin')
+        bars_count = sum(1 for p in today_top_5 if p.get('product_type') == 'bar')
+        coins_count = sum(1 for p in today_top_5 if p.get('product_type') == 'coin')
         
         # Compare with yesterday
         yesterday_avg = 0
@@ -110,10 +110,10 @@ class DailyReportGenerator:
         
         if yesterday_data:
             yesterday_products = yesterday_data.get('products', [])
-            yesterday_top_10 = self.get_top_products(yesterday_products, top_n=10, metal_type=metal_type)
+            yesterday_top_5 = self.get_top_products(yesterday_products, top_n=5, metal_type=metal_type)
             
-            if yesterday_top_10:
-                yesterday_avg = sum(p['price_per_g_fine_bgn'] for p in yesterday_top_10) / len(yesterday_top_10)
+            if yesterday_top_5:
+                yesterday_avg = sum(p['price_per_g_fine_bgn'] for p in yesterday_top_5) / len(yesterday_top_5)
                 price_change_pct = ((today_avg - yesterday_avg) / yesterday_avg * 100) if yesterday_avg > 0 else 0
                 
                 # Determine trend
@@ -133,10 +133,35 @@ class DailyReportGenerator:
         if today_live_price and yesterday_live_price:
             live_price_change_pct = ((today_live_price - yesterday_live_price) / yesterday_live_price * 100)
         
+        # Get affordable deals (products under 5000 BGN for gold, under 2000 for silver)
+        price_limit = 5000 if metal_type == 'gold' else 2000
+        affordable_products = [p for p in today_products 
+                              if p.get('price_per_g_fine_bgn') 
+                              and p.get('sell_price_bgn') 
+                              and p.get('sell_price_bgn') != 0
+                              and p.get('sell_price_bgn') != ''
+                              and p.get('sell_price_bgn') < price_limit]
+        
+        # Filter by metal type
+        if metal_type:
+            metal_field = f'fine_{metal_type}_g'
+            affordable_products = [p for p in affordable_products if p.get(metal_field)]
+        
+        # Sort by price per gram and get top 10
+        affordable_products_sorted = sorted(affordable_products, 
+                                           key=lambda x: x.get('price_per_g_fine_bgn', float('inf')))[:10]
+        
+        # Remove Tavex fields from affordable products
+        clean_affordable = []
+        for product in affordable_products_sorted:
+            clean_product = {k: v for k, v in product.items() 
+                           if not k.startswith('tavex_') and k != 'is_cheaper'}
+            clean_affordable.append(clean_product)
+        
         return {
             'today_date': today_data.get('date'),
             'yesterday_date': yesterday_data.get('date') if yesterday_data else None,
-            'top_10_count': len(today_top_10),
+            'top_5_count': len(today_top_5),
             'average_price_per_gram': round(today_avg, 2),
             'yesterday_average': round(yesterday_avg, 2) if yesterday_avg > 0 else None,
             'price_change_pct': round(price_change_pct, 2),
@@ -147,7 +172,8 @@ class DailyReportGenerator:
             },
             'new_products_count': new_products_count,
             'total_products_today': len(today_products),
-            'best_deals': today_top_10,
+            'best_deals': today_top_5,
+            'affordable_deals': clean_affordable,
             'live_price_today': today_live_price,
             'live_price_yesterday': yesterday_live_price,
             'live_price_change_pct': round(live_price_change_pct, 2) if today_live_price and yesterday_live_price else None
@@ -174,28 +200,50 @@ class DailyReportGenerator:
         else:
             change_emoji = '➡️'
         
-        # Build best deals list (top 10) - split into two fields to avoid Discord 1024 char limit
-        best_deals_part1 = ""
-        best_deals_part2 = ""
+        # Build best deals list (top 5) - single field
+        best_deals_text = ""
         
-        for i, product in enumerate(stats['best_deals'][:10], 1):
-            name = product['product_name'][:50]  # Shortened to fit better
+        for i, product in enumerate(stats['best_deals'][:5], 1):
+            name = product['product_name'][:45]  # Shortened to fit spread info
             price_per_g = product['price_per_g_fine_bgn']
             sell_price = product.get('sell_price_bgn', 0)
+            spread = product.get('spread_percentage', 0)
             url = product.get('url', '')
             
             deal_line = f"{i}. **{name}** - {price_per_g:.2f} BGN/g"
             if sell_price:
                 deal_line += f" | {sell_price:.0f} BGN"
+            if spread:
+                deal_line += f" | Spread: {spread:.1f}%"
             if url:
                 deal_line += f" | [View]({url})"
-            deal_line += "\n"
-            
-            # Split into two fields (5 products each)
-            if i <= 5:
-                best_deals_part1 += deal_line
-            else:
-                best_deals_part2 += deal_line
+            best_deals_text += deal_line + "\n"
+        
+        # Build affordable deals (products under 5000 BGN with best price per gram) - split into two fields
+        affordable_part1 = ""
+        affordable_part2 = ""
+        if 'affordable_deals' in stats and stats['affordable_deals']:
+            for i, product in enumerate(stats['affordable_deals'][:10], 1):
+                name = product['product_name'][:45]
+                price_per_g = product['price_per_g_fine_bgn']
+                sell_price = product.get('sell_price_bgn', 0)
+                spread = product.get('spread_percentage', 0)
+                url = product.get('url', '')
+                
+                deal_line = f"{i}. **{name}** - {price_per_g:.2f} BGN/g"
+                if sell_price:
+                    deal_line += f" | {sell_price:.0f} BGN"
+                if spread:
+                    deal_line += f" | Spread: {spread:.1f}%"
+                if url:
+                    deal_line += f" | [View]({url})"
+                deal_line += "\n"
+                
+                # Split into two fields (5 products each)
+                if i <= 5:
+                    affordable_part1 += deal_line
+                else:
+                    affordable_part2 += deal_line
         
         # Build embed fields
         fields = [
@@ -205,7 +253,7 @@ class DailyReportGenerator:
                 "inline": True
             },
             {
-                "name": "Avg Price/gram (Top 10)",
+                "name": "Avg Price/gram (Top 5)",
                 "value": f"{stats['average_price_per_gram']} BGN",
                 "inline": True
             },
@@ -249,18 +297,26 @@ class DailyReportGenerator:
                 "inline": False
             })
         
-        # Add best deals (split into two fields if needed)
-        if best_deals_part1:
+        # Add best deals (single field for 5 products)
+        if best_deals_text:
             fields.append({
-                "name": "🏆 Top 10 Best Deals (1-5)",
-                "value": best_deals_part1,
+                "name": "🏆 Top 5 Best Deals",
+                "value": best_deals_text,
                 "inline": False
             })
         
-        if best_deals_part2:
+        # Add affordable deals section (for gold only - under 5000 BGN, split into two fields)
+        if affordable_part1 and metal_type == "gold":
             fields.append({
-                "name": "🏆 Top 10 Best Deals (6-10)",
-                "value": best_deals_part2,
+                "name": "💰 Affordable Best Deals - Under 5000 BGN (1-5)",
+                "value": affordable_part1,
+                "inline": False
+            })
+        
+        if affordable_part2 and metal_type == "gold":
+            fields.append({
+                "name": "💰 Affordable Best Deals - Under 5000 BGN (6-10)",
+                "value": affordable_part2,
                 "inline": False
             })
         
@@ -274,11 +330,11 @@ class DailyReportGenerator:
         embed = {
             "embeds": [{
                 "title": f"📊 Daily {metal_name} Market Report",
-                "description": f"Top 10 products comparison: {stats['today_date']}",
+                "description": f"Top 5 products comparison: {stats['today_date']}",
                 "color": color,
                 "fields": fields,
                 "footer": {
-                    "text": f"Tracking top 10 products by price per gram • Data from igold.bg"
+                    "text": f"Tracking top 5 products by price per gram • Data from igold.bg"
                 },
                 "timestamp": datetime.now().isoformat()
             }]
