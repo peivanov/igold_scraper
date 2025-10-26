@@ -44,7 +44,8 @@ def organize_daily_data():
     
     # Find today's CSV files
     # Be specific to avoid matching silver CSV with gold pattern (igold_silver has "gold" in it)
-    gold_files = glob.glob('igold_gold_products_sorted*.csv')
+    # Handle both regular and tavex-comparison CSV files
+    gold_files = glob.glob('igold_gold_products_sorted*.csv') + glob.glob('igold_tavex_gold_products_sorted*.csv')
     silver_files = glob.glob('igold_silver_products_sorted*.csv')
     
     for csv_file in gold_files:
