@@ -1,6 +1,6 @@
 {
   "date": "2025-10-26",
-  "scrape_time": "2025-10-26T07:56:30.267332",
+  "scrape_time": "2025-10-26T08:12:00.225865",
   "source": "igold.bg",
   "product_type": "gold",
   "products": [
@@ -1807,7 +1807,7 @@
     {
       "product_name": "8.96 гр. 20 Шведски Крони Оскар II 1872- 1907",
       "url": "https://igold.bg/20-zlatni-kroni-oscar-ii",
-      "product_type": "bar",
+      "product_type": "coin",
       "total_weight_g": 8.96,
       "purity_per_mille": 900.0,
       "fine_gold_g": 8.06,
