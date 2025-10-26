@@ -2,8 +2,8 @@ name: Daily Precious Metals Scraper
 
 on:
   schedule:
-    # Run daily at 06:00 UTC (09:00 Bulgarian time)
-    - cron: '0 6 * * *'
+    # Run daily at 08:00 UTC (10:00 Bulgarian time)
+    - cron: '0 8 * * *'
   workflow_dispatch: # Allow manual triggering
 
 permissions:
