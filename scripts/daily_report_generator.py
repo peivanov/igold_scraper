@@ -174,20 +174,28 @@ class DailyReportGenerator:
         else:
             change_emoji = '➡️'
         
-        # Build best deals list (top 10)
-        best_deals_text = ""
+        # Build best deals list (top 10) - split into two fields to avoid Discord 1024 char limit
+        best_deals_part1 = ""
+        best_deals_part2 = ""
+        
         for i, product in enumerate(stats['best_deals'][:10], 1):
-            name = product['product_name'][:60]
+            name = product['product_name'][:50]  # Shortened to fit better
             price_per_g = product['price_per_g_fine_bgn']
             sell_price = product.get('sell_price_bgn', 0)
             url = product.get('url', '')
             
-            best_deals_text += f"{i}. **{name}** - {price_per_g:.2f} BGN/g"
+            deal_line = f"{i}. **{name}** - {price_per_g:.2f} BGN/g"
             if sell_price:
-                best_deals_text += f" | Total: {sell_price:.0f} BGN"
+                deal_line += f" | {sell_price:.0f} BGN"
             if url:
-                best_deals_text += f" | [View]({url})"
-            best_deals_text += "\n"
+                deal_line += f" | [View]({url})"
+            deal_line += "\n"
+            
+            # Split into two fields (5 products each)
+            if i <= 5:
+                best_deals_part1 += deal_line
+            else:
+                best_deals_part2 += deal_line
         
         # Build embed fields
         fields = [
@@ -241,11 +249,18 @@ class DailyReportGenerator:
                 "inline": False
             })
         
-        # Add best deals
-        if best_deals_text:
+        # Add best deals (split into two fields if needed)
+        if best_deals_part1:
             fields.append({
-                "name": "🏆 Top 10 Best Deals",
-                "value": best_deals_text,
+                "name": "🏆 Top 10 Best Deals (1-5)",
+                "value": best_deals_part1,
+                "inline": False
+            })
+        
+        if best_deals_part2:
+            fields.append({
+                "name": "🏆 Top 10 Best Deals (6-10)",
+                "value": best_deals_part2,
                 "inline": False
             })
         
