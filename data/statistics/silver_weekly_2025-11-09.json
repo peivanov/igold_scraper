@@ -1,0 +1,168 @@
+{
+  "report_type": "weekly",
+  "metal_type": "silver",
+  "report_date": "2025-11-09",
+  "period_start": "2025-11-03",
+  "period_end": "2025-11-09",
+  "statistics": {
+    "period_days": 7,
+    "unique_products_in_top_10": 19,
+    "average_price_per_gram": 4.590142857142857,
+    "price_volatility": 0.19644628491560442,
+    "price_trend": "decreasing",
+    "cheapest_products": [
+      {
+        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Кенгуру",
+        "url": "https://igold.bg/srebarna-moneta-1-oz-kenguru",
+        "product_type": "coin",
+        "total_weight_g": 31.1,
+        "purity_per_mille": 999.0,
+        "fine_silver_g": 31.1,
+        "price_bgn": 107.93,
+        "price_eur": 55.18,
+        "price_per_g_fine_bgn": 3.47,
+        "price_per_g_fine_eur": 1.77,
+        "buy_price_bgn": 102.77,
+        "sell_price_bgn": 107.93,
+        "spread_percentage": 4.78
+      },
+      {
+        "product_name": "311 гр. (10 toz.) Сребърно Кюлче Тор Royal Mint",
+        "url": "https://igold.bg/srebarno-kyulche-10-oz-tor-royal-mint",
+        "product_type": "bar",
+        "total_weight_g": 311.0,
+        "purity_per_mille": 999.9,
+        "fine_silver_g": 311.0,
+        "price_bgn": 1197.0,
+        "price_eur": 612.02,
+        "price_per_g_fine_bgn": 3.85,
+        "price_per_g_fine_eur": 1.97,
+        "buy_price_bgn": 865.0,
+        "sell_price_bgn": 1197.0,
+        "spread_percentage": 27.74
+      },
+      {
+        "product_name": "250 гр. Сребърно Кюлче Argor- Heraeus Швейцария",
+        "url": "https://igold.bg/srebarno-kyulche-250-g-argor-heraeus",
+        "product_type": "bar",
+        "total_weight_g": 250.0,
+        "purity_per_mille": 999.5,
+        "fine_silver_g": 250.0,
+        "price_bgn": 970.0,
+        "price_eur": 495.95,
+        "price_per_g_fine_bgn": 3.88,
+        "price_per_g_fine_eur": 1.98,
+        "buy_price_bgn": 715.0,
+        "sell_price_bgn": 970.0,
+        "spread_percentage": 26.29
+      },
+      {
+        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Британски Лъв 2025",
+        "url": "https://igold.bg/srebarna-moneta-1-oz-britanski-lav",
+        "product_type": "coin",
+        "total_weight_g": 31.1,
+        "purity_per_mille": 999.5,
+        "fine_silver_g": 31.1,
+        "price_bgn": 147.0,
+        "price_eur": 75.16,
+        "price_per_g_fine_bgn": 4.73,
+        "price_per_g_fine_eur": 2.42,
+        "buy_price_bgn": 90.0,
+        "sell_price_bgn": 147.0,
+        "spread_percentage": 38.78
+      },
+      {
+        "product_name": "311 гр. (10 toz.) Сребърна Монета Зверовете на Тюдорите Козелът от Бофорт 2023",
+        "url": "https://igold.bg/srebarna-moneta-10-oz-kozelat-ot-bofort-2023",
+        "product_type": "coin",
+        "total_weight_g": 311.0,
+        "purity_per_mille": 999.0,
+        "fine_silver_g": 311.0,
+        "price_bgn": 1472.0,
+        "price_eur": 752.62,
+        "price_per_g_fine_bgn": 4.73,
+        "price_per_g_fine_eur": 2.42,
+        "buy_price_bgn": 897.0,
+        "sell_price_bgn": 1472.0,
+        "spread_percentage": 39.06
+      }
+    ],
+    "product_type_breakdown": {
+      "bars": 24,
+      "coins": 46
+    },
+    "daily_top_10_averages": [
+      {
+        "date": "2025-11-09",
+        "average_price": 4.4670000000000005,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-11-08",
+        "average_price": 4.211,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-11-07",
+        "average_price": 4.565,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-11-06",
+        "average_price": 4.764,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-11-05",
+        "average_price": 4.714,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-11-04",
+        "average_price": 4.71,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-11-03",
+        "average_price": 4.7,
+        "top_10_count": 10
+      }
+    ],
+    "trend_percentage": -4.957446808510631,
+    "live_prices": [
+      {
+        "date": "2025-11-09",
+        "price": 2.63
+      },
+      {
+        "date": "2025-11-08",
+        "price": 2.63
+      },
+      {
+        "date": "2025-11-07",
+        "price": 2.65
+      },
+      {
+        "date": "2025-11-06",
+        "price": 2.65
+      },
+      {
+        "date": "2025-11-05",
+        "price": 2.62
+      },
+      {
+        "date": "2025-11-04",
+        "price": 2.61
+      },
+      {
+        "date": "2025-11-03",
+        "price": 2.68
+      }
+    ],
+    "live_price_trend_percentage": -1.8656716417910546,
+    "live_price_trend": "stable",
+    "current_live_price_bgn_g": 2.63,
+    "live_price_metal": "silver"
+  },
+  "data_points": 7
+}
