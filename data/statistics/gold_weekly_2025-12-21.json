@@ -1,0 +1,168 @@
+{
+  "report_type": "weekly",
+  "metal_type": "gold",
+  "report_date": "2025-12-21",
+  "period_start": "2025-12-15",
+  "period_end": "2025-12-21",
+  "statistics": {
+    "period_days": 7,
+    "unique_products_in_top_10": 10,
+    "average_price_per_gram": 240.6107142857143,
+    "price_volatility": 1.2973603604095114,
+    "price_trend": "stable",
+    "cheapest_products": [
+      {
+        "product_name": "250 гр. Златно Кюлче Valcambi Швейцария",
+        "url": "https://igold.bg/zlatno-kyulche-250-g-valcambi",
+        "product_type": "bar",
+        "total_weight_g": 250.0,
+        "purity_per_mille": "999.9/1000",
+        "fine_gold_g": 250.0,
+        "sell_price_bgn": 59618.0,
+        "buy_price_bgn": 58542.0,
+        "sell_price_eur": 30482.2,
+        "buy_price_eur": 29932.05,
+        "price_per_g_fine_bgn": 238.47,
+        "price_per_g_fine_eur": 121.93,
+        "spread_percentage": 1.8
+      },
+      {
+        "product_name": "100 гр. Златно Кюлче Argor-Heraeus Швейцария Холограмна Защита",
+        "url": "https://igold.bg/zlatno-kyulche-100-g-argor-heraeus-kinebar",
+        "product_type": "bar",
+        "total_weight_g": 100.0,
+        "purity_per_mille": "999.9/1000",
+        "fine_gold_g": 100.0,
+        "sell_price_bgn": 23889.0,
+        "buy_price_bgn": 23545.0,
+        "sell_price_eur": 12214.25,
+        "buy_price_eur": 12038.37,
+        "price_per_g_fine_bgn": 238.89,
+        "price_per_g_fine_eur": 122.14,
+        "spread_percentage": 1.44
+      },
+      {
+        "product_name": "100 гр. Златно Кюлче Valcambi Швейцария",
+        "url": "https://igold.bg/zlatno-kyulche-valcambi-100-g",
+        "product_type": "bar",
+        "total_weight_g": 100.0,
+        "purity_per_mille": "999.9/1000",
+        "fine_gold_g": 100.0,
+        "sell_price_bgn": 23889.0,
+        "buy_price_bgn": 23545.0,
+        "sell_price_eur": 12214.25,
+        "buy_price_eur": 12038.37,
+        "price_per_g_fine_bgn": 238.89,
+        "price_per_g_fine_eur": 122.14,
+        "spread_percentage": 1.44
+      },
+      {
+        "product_name": "50 гр. Златно Кюлче Valcambi Швейцария",
+        "url": "https://igold.bg/zlatno-kyulche-valcambi-50-g",
+        "product_type": "bar",
+        "total_weight_g": 50.0,
+        "purity_per_mille": "999.9/1000",
+        "fine_gold_g": 50.0,
+        "sell_price_bgn": 12064.0,
+        "buy_price_bgn": 11988.0,
+        "sell_price_eur": 6168.23,
+        "buy_price_eur": 6129.37,
+        "price_per_g_fine_bgn": 241.28,
+        "price_per_g_fine_eur": 123.36,
+        "spread_percentage": 0.63
+      },
+      {
+        "product_name": "50 гр. Златно Кюлче Argor- Heraeus Швейцария Холограмна Защита",
+        "url": "https://igold.bg/zlatno-kyulche-50-g-argor-heraeus-kinebar",
+        "product_type": "bar",
+        "total_weight_g": 50.0,
+        "purity_per_mille": "999.9/1000",
+        "fine_gold_g": 50.0,
+        "sell_price_bgn": 12075.0,
+        "buy_price_bgn": 12000.0,
+        "sell_price_eur": 6173.85,
+        "buy_price_eur": 6135.5,
+        "price_per_g_fine_bgn": 241.5,
+        "price_per_g_fine_eur": 123.48,
+        "spread_percentage": 0.62
+      }
+    ],
+    "product_type_breakdown": {
+      "bars": 42,
+      "coins": 28
+    },
+    "daily_top_10_averages": [
+      {
+        "date": "2025-12-21",
+        "average_price": 241.612,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-12-20",
+        "average_price": 241.612,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-12-19",
+        "average_price": 240.74200000000002,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-12-18",
+        "average_price": 240.641,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-12-17",
+        "average_price": 240.453,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-12-16",
+        "average_price": 237.87,
+        "top_10_count": 10
+      },
+      {
+        "date": "2025-12-15",
+        "average_price": 241.345,
+        "top_10_count": 10
+      }
+    ],
+    "trend_percentage": 0.11063001098013048,
+    "live_prices": [
+      {
+        "date": "2025-12-21",
+        "price": 233.05
+      },
+      {
+        "date": "2025-12-20",
+        "price": 233.05
+      },
+      {
+        "date": "2025-12-19",
+        "price": 232.06
+      },
+      {
+        "date": "2025-12-18",
+        "price": 232.01
+      },
+      {
+        "date": "2025-12-17",
+        "price": 231.84
+      },
+      {
+        "date": "2025-12-16",
+        "price": 229.31
+      },
+      {
+        "date": "2025-12-15",
+        "price": 232.75
+      }
+    ],
+    "live_price_trend_percentage": 0.1288936627282541,
+    "live_price_trend": "stable",
+    "current_live_price_bgn_g": 233.05,
+    "live_price_metal": "gold"
+  },
+  "data_points": 7
+}
