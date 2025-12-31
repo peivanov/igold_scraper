@@ -1,0 +1,30 @@
+[
+  {
+    "timestamp": "2025-12-31T08:04:15.321000",
+    "date": "2025-12-31",
+    "metal": "XAU",
+    "metal_name": "gold",
+    "source": "Live XAU/EUR Market Data",
+    "platform": "MarketData",
+    "spread_profile": "standard",
+    "prices": {
+      "eur_per_oz": {
+        "bid": 3687.3,
+        "ask": 3688.3,
+        "mid": 3687.8,
+        "spread": 9.6
+      },
+      "eur_per_gram": {
+        "bid": 118.55,
+        "ask": 118.58,
+        "mid": 118.57
+      },
+      "bgn_per_gram": {
+        "bid": 231.86,
+        "ask": 231.92,
+        "mid": 231.89
+      }
+    },
+    "eur_to_bgn_rate": 1.9558
+  }
+]
