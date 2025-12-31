@@ -143,7 +143,7 @@ def extract_product_data(url):
         r = requests.get(url, headers=HEADERS, timeout=30)
         r.raise_for_status()
     except Exception as e:
-        logger.warning(f"Failed to fetch {url}: {e}")
+        logger.warning("Failed to fetch %s: %s", url, e)
         return None
     
     time.sleep(random_delay())
@@ -429,13 +429,13 @@ def gather_product_links():
     
     # Only scan the main silver page
     url = urljoin(BASE, "/srebro")
-    logger.info(f"Scanning main silver page: {url}")
+    logger.info("Scanning main silver page: %s", url)
     
     try:
         r = requests.get(url, headers=HEADERS, timeout=30)
         r.raise_for_status()
     except Exception as e:
-        logger.error(f"Failed to open main silver page {url}: {e}")
+        logger.error("Failed to open main silver page %s: %s", url, e)
         return []
         
     time.sleep(random_delay())
@@ -483,7 +483,7 @@ def gather_product_links():
             out.add(full_url)
             found_product_links += 1
     
-    logger.info(f"Found {found_product_links} potential silver product links")
+    logger.info("Found %d potential silver product links", found_product_links)
     
     # Also look for product containers or grids specifically
     product_containers = soup.select('.products, .product-grid, .product-list, .items-grid, .woocommerce-products-grid, .shop-products, .product-container')
@@ -536,7 +536,7 @@ def gather_product_links():
             
         filtered_urls.append(product_url)
     
-    logger.info(f"Found {len(filtered_urls)} unique silver product links from main page")
+    logger.info("Found %d unique silver product links from main page", len(filtered_urls))
     return sorted(filtered_urls)
 
 def sort_key_function(item):
@@ -556,11 +556,11 @@ def main():
     parser.add_argument('--add-timestamp', action='store_true', help='Add timestamp to output filename (format: ddmmyyhhmm)')
     args = parser.parse_args()
 
-    print(f"Starting igold.bg silver scraper")
-    print(f"Scraping silver coins and silver bars from https://igold.bg/srebro...")
+    print("Starting igold.bg silver scraper")
+    print("Scraping silver coins and silver bars from https://igold.bg/srebro...")
     
     links = gather_product_links()
-    logger.info(f"Found {len(links)} candidate silver product links.")
+    logger.info("Found %d candidate silver product links.", len(links))
     
     if not links:
         logger.error("No silver product links found. The site structure might have changed.")
@@ -576,16 +576,20 @@ def main():
             
             # Log product name and key stats
             if data.get('fine_silver_g') and data.get('price_bgn'):
-                logger.debug(f"Extracted: {data['product_type']} - {data['product_name']} - {data['fine_silver_g']}g @ {data['price_bgn']} BGN")
+                logger.debug("Extracted: %s - %s - %sg @ %s BGN",
+                             data['product_type'],
+                             data['product_name'],
+                             data['fine_silver_g'],
+                             data['price_bgn'])
         else:
             failed_count += 1
             if failed_count <= 5:  # Show first few failures for debugging
-                logger.warning(f"Failed to extract data from: {link}")
+                logger.warning("Failed to extract data from: %s", link)
 
     # Sort results by price per gram (ascending - lowest to highest)
     results.sort(key=sort_key_function)
     
-    logger.info(f"\nSorting {len(results)} silver products by price per gram (BGN)...")
+    logger.info("\nSorting %d silver products by price per gram (BGN)...", len(results))
 
     # Define CSV fields
     keys = ['product_name','url','product_type','total_weight_g','purity_per_mille','fine_silver_g',
@@ -607,42 +611,42 @@ def main():
         for r in results:
             writer.writerow(r)
     
-    logger.info(f"Wrote {len(results)} silver products to {fname}")
-    logger.info(f"Failed to extract data from {failed_count} links")
+    logger.info("Wrote %d silver products to %s", len(results), fname)
+    logger.info("Failed to extract data from %d links", failed_count)
     
     # Count products by type
     bars = [r for r in results if r.get('product_type') == 'bar']
     coins = [r for r in results if r.get('product_type') == 'coin']
     unknown = [r for r in results if r.get('product_type') == 'unknown']
     
-    logger.info(f"Silver product breakdown: {len(bars)} bars, {len(coins)} coins, {len(unknown)} unknown")
+    logger.info("Silver product breakdown: %d bars, %d coins, %d unknown", len(bars), len(coins), len(unknown))
     
     # Show summary of prices found
     with_prices = [r for r in results if r.get('price_bgn') or r.get('sell_price_bgn')]
     with_price_per_gram = [r for r in results if r.get('price_per_g_fine_bgn')]
     
-    logger.info(f"Products with prices: {len(with_prices)}/{len(results)}")
-    logger.info(f"Products with price per gram: {len(with_price_per_gram)}/{len(results)}")
+    logger.info("Products with prices: %d/%d", len(with_prices), len(results))
+    logger.info("Products with price per gram: %d/%d", len(with_price_per_gram), len(results))
 
     # Show analysis if we have results
     if with_price_per_gram:
-        logger.info(f"\n=== TOP 10 CHEAPEST SILVER PER GRAM (BGN) ===")
+        logger.info("\n=== TOP 10 CHEAPEST SILVER PER GRAM (BGN) ===")
         for i, item in enumerate(with_price_per_gram[:10]):
             name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
-            logger.info(f"{i+1}. {name} ({item['product_type']})")
-            logger.info(f"   Price per gram: {item['price_per_g_fine_bgn']} BGN")
-            logger.info(f"   Total price: {item['price_bgn']} BGN")
-            logger.info(f"   Fine silver: {item['fine_silver_g']} g")
+            logger.info("%d. %s (%s)", i+1, name, item['product_type'])
+            logger.info("   Price per gram: %s BGN", item['price_per_g_fine_bgn'])
+            logger.info("   Total price: %s BGN", item['price_bgn'])
+            logger.info("   Fine silver: %s g", item['fine_silver_g'])
             logger.info("")
         
         if len(with_price_per_gram) >= 3:
-            logger.info(f"=== TOP 3 MOST EXPENSIVE SILVER PER GRAM (BGN) ===")
+            logger.info("=== TOP 3 MOST EXPENSIVE SILVER PER GRAM (BGN) ===")
             for i, item in enumerate(with_price_per_gram[-3:][::-1]):
                 name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
-                logger.info(f"{i+1}. {name} ({item['product_type']})")
-                logger.info(f"   Price per gram: {item['price_per_g_fine_bgn']} BGN")
-                logger.info(f"   Total price: {item['price_bgn']} BGN")
-                logger.info(f"   Fine silver: {item['fine_silver_g']} g")
+                logger.info("%d. %s (%s)", i+1, name, item['product_type'])
+                logger.info("   Price per gram: %s BGN", item['price_per_g_fine_bgn'])
+                logger.info("   Total price: %s BGN", item['price_bgn'])
+                logger.info("   Fine silver: %s g", item['fine_silver_g'])
                 logger.info("")
 
     # Show spread analysis if available
@@ -650,12 +654,12 @@ def main():
     if with_spread:
         spread_sorted = sorted(with_spread, key=lambda x: x['spread_percentage'])
         
-        logger.info(f"\n=== TOP 5 SILVER PRODUCTS WITH LOWEST SPREAD ===")
+        logger.info("\n=== TOP 5 SILVER PRODUCTS WITH LOWEST SPREAD ===")
         for i, item in enumerate(spread_sorted[:5]):
             name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
-            logger.info(f"{i+1}. {name} ({item['product_type']})")
-            logger.info(f"   Spread: {item['spread_percentage']}%")
-            logger.info(f"   Buy: {item['buy_price_bgn']} BGN, Sell: {item['sell_price_bgn']} BGN")
+            logger.info("%d. %s (%s)", i+1, name, item['product_type'])
+            logger.info("   Spread: %s%%", item['spread_percentage'])
+            logger.info("   Buy: %s BGN, Sell: %s BGN", item['buy_price_bgn'], item['sell_price_bgn'])
             logger.info("")
 
 if __name__ == '__main__':
