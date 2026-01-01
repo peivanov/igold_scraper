@@ -97,7 +97,7 @@ def extract_product_data(url: str, product_type: str) -> dict:
         r = requests.get(url, headers=HEADERS, timeout=30)
         r.raise_for_status()
     except Exception as e:
-        logger.warning(f"Failed to fetch {url}: {e}")
+        logger.warning("Failed to fetch %s: %s", url, e)
         return {}
 
     time.sleep(random_delay())
@@ -179,11 +179,11 @@ def extract_product_data(url: str, product_type: str) -> dict:
 def gather_product_links(url: str) -> list[str]:
     """Collect product links from category pages using XPath."""
     product_urls = set()
-    logger.info(f"Scanning page: {url}")
+    logger.info("Scanning page: %s", url)
 
     r = requests.get(url, headers=HEADERS, timeout=30)
     if r.status_code != 200:
-        logger.warning(f"Failed to open page {url}: {r.status_code}")
+        logger.warning("Failed to open page %s: %s", url, r.status_code)
         return []
 
     time.sleep(random_delay())
@@ -195,7 +195,7 @@ def gather_product_links(url: str) -> list[str]:
     new_products = {urljoin(BASE, href) for href in product_hrefs if href not in URLS_TO_SKIP}
     product_urls.update(new_products)
 
-    logger.info(f"Found {len(new_products)} product links on {url}")
+    logger.info("Found %d product links on %s", len(new_products), url)
 
     # Log titles in debug mode
     if logger.level <= logging.DEBUG and new_products:
@@ -203,7 +203,7 @@ def gather_product_links(url: str) -> list[str]:
         for link in product_links:
             h2_text = link.xpath('string(.//h2)')
             if h2_text:
-                logger.debug(f"  Found: {h2_text.strip()} -> {urljoin(BASE, link.get('href'))}")
+                logger.debug("  Found: %s -> %s", h2_text.strip(), urljoin(BASE, link.get('href')))
 
     return sorted(product_urls)
 
@@ -280,7 +280,7 @@ def add_tavex_data_to_results(results, tavex_products, equivalent_products):
     Returns:
         Updated results list with Tavex data
     """
-    logger.info(f"Adding Tavex comparison data to {len(results)} igold products...")
+    logger.info("Adding Tavex comparison data to %d igold products...", len(results))
 
     # Track statistics
     matched_count = 0
@@ -304,8 +304,8 @@ def add_tavex_data_to_results(results, tavex_products, equivalent_products):
             result['is_cheaper'] = None
             result['tavex_product_name'] = None
 
-    logger.info(f"Found Tavex equivalents for {matched_count} products")
-    logger.info(f"igold is cheaper for {cheaper_count} products")
+    logger.info("Found Tavex equivalents for %d products", matched_count)
+    logger.info("igold is cheaper for %d products", cheaper_count)
 
     return results
 
@@ -316,8 +316,8 @@ def main():
     parser.add_argument('--add-timestamp', action='store_true', help='Add timestamp to output filename (format: ddmmyyhhmm)')
     args = parser.parse_args()
 
-    logger.info(f"Starting igold.bg gold scraper")
-    logger.info(f"Scraping both gold coins and gold bars...")
+    logger.info("Starting igold.bg gold scraper")
+    logger.info("Scraping both gold coins and gold bars...")
     
     # If comparing with Tavex, load necessary data
     tavex_products = None
@@ -330,16 +330,16 @@ def main():
         try:
             with open('equivalent_products.json', 'r', encoding='utf-8') as f:
                 equivalent_products = json.load(f)
-            logger.info(f"Loaded {len(equivalent_products)} product mappings from equivalent_products.json")
+            logger.info("Loaded %d product mappings from equivalent_products.json", len(equivalent_products))
         except Exception as e:
-            logger.error(f"Failed to load equivalent_products.json: {e}")
+            logger.error("Failed to load equivalent_products.json: %s", e)
             logger.info("Cannot continue with Tavex comparison without equivalent_products.json")
             return
 
         # Scrape Tavex products
         logger.info("Scraping Tavex products...")
         tavex_products = scrape_tavex_gold_products()
-        logger.info(f"Scraped {len(tavex_products)} products from Tavex")
+        logger.info("Scraped %d products from Tavex", len(tavex_products))
 
     # {"coin": {links: [...]}, "bar": {links: [...]}, ...}
     url_data = {}
@@ -352,7 +352,7 @@ def main():
         url_data[product_type] = {"links": product_urls}
 
     num_product_links = len([link for data in url_data.values() for link in data['links']])
-    logger.info(f"Found {num_product_links} candidate product links.")
+    logger.info("Found %d candidate product links.", num_product_links)
 
     if not url_data.values() or all(len(data['links']) == 0 for data in url_data.values()):
         logger.error("No product links found. The site structure might have changed.")
@@ -362,7 +362,7 @@ def main():
     failed_count = 0
 
     for product_type, data in url_data.items():
-        logger.info(f"Starting to scan {len(data['links'])} links for {product_type} products...")
+        logger.info("Starting to scan %d links for %s products...", len(data['links']), product_type)
 
         for link in tqdm(data['links'], desc=f"Processing {product_type} products"):
             product_data = extract_product_data(link, product_type)
@@ -371,12 +371,15 @@ def main():
 
                 # Log product name and key stats
                 if product_data.get('fine_gold_g') and product_data.get('price_bgn'):
-                    logger.debug(f"Extracted: {product_data['product_type']} - {product_data['product_name']} - "
-                                 f"{product_data['fine_gold_g']}g @ {product_data['price_bgn']} BGN")
+                    logger.debug("Extracted: %s - %s - %sg @ %s BGN",
+                                 product_data['product_type'],
+                                 product_data['product_name'],
+                                 product_data['fine_gold_g'],
+                                 product_data['price_bgn'])
             else:
                 failed_count += 1
                 if failed_count <= 5:  # Show first few failures for debugging
-                    logger.warning(f"Failed to extract data from: {link}")
+                    logger.warning("Failed to extract data from: %s", link)
 
     # If comparing with Tavex, add Tavex data to results
     if args.compare_tavex and tavex_products and equivalent_products:
@@ -386,7 +389,7 @@ def main():
     # Items without price per gram will be placed at the end
     results.sort(key=sort_key_function)
     
-    logger.info(f"\nSorting {len(results)} products by price per gram (BGN)...")
+    logger.info("\nSorting %d products by price per gram (BGN)...", len(results))
 
     # Define CSV fields based on whether we're comparing with Tavex
     if args.compare_tavex:
@@ -414,35 +417,35 @@ def main():
         writer.writeheader()
         for r in results:
             writer.writerow(r)
-    
-    logger.info(f"Wrote {len(results)} rows to {fname}")
-    logger.info(f"Failed to extract data from {failed_count} links")
- 
+
+    logger.info("Wrote %d rows to %s", len(results), fname)
+    logger.info("Failed to extract data from %d links", failed_count)
+
     # Count products by type
     bars = [r for r in results if r.get('product_type') == 'bar']
     coins = [r for r in results if r.get('product_type') == 'coin']
     unknown = [r for r in results if r.get('product_type') == 'unknown']
 
-    logger.info(f"Product breakdown: {len(bars)} bars, {len(coins)} coins, {len(unknown)} unknown")
+    logger.info("Product breakdown: %d bars, %d coins, %d unknown", len(bars), len(coins), len(unknown))
 
     # Show summary of prices found
     with_prices = [r for r in results if r.get('price_bgn') or r.get('sell_price_bgn')]
     with_price_per_gram = [r for r in results if r.get('price_per_g_fine_bgn')]
- 
-    logger.info(f"Products with prices: {len(with_prices)}/{len(results)}")
-    logger.info(f"Products with price per gram: {len(with_price_per_gram)}/{len(results)}")
+
+    logger.info("Products with prices: %d/%d", len(with_prices), len(results))
+    logger.info("Products with price per gram: %d/%d", len(with_price_per_gram), len(results))
 
     # If comparing with Tavex, show comparison statistics
     if args.compare_tavex:
         with_tavex_match = [r for r in results if r.get('tavex_sell_price_bgn') is not None]
         cheaper_than_tavex = [r for r in with_tavex_match if r.get('is_cheaper') == "YES"]
 
-        logger.info(f"\n=== TAVEX COMPARISON SUMMARY ===")
-        logger.info(f"Products with Tavex match: {len(with_tavex_match)}/{len(results)}")
-        logger.info(f"Products cheaper at igold: {len(cheaper_than_tavex)}/{len(with_tavex_match)}")
+        logger.info("\n=== TAVEX COMPARISON SUMMARY ===")
+        logger.info("Products with Tavex match: %d/%d", len(with_tavex_match), len(results))
+        logger.info("Products cheaper at igold: %d/%d", len(cheaper_than_tavex), len(with_tavex_match))
 
         if cheaper_than_tavex:
-            logger.info(f"\n=== TOP 10 BETTER DEALS AT IGOLD ===")
+            logger.info("\n=== TOP 10 BETTER DEALS AT IGOLD ===")
             # Sort by price difference percentage (biggest savings first)
             better_deals = []
             for item in cheaper_than_tavex:
@@ -454,55 +457,55 @@ def main():
 
             for i, (item, saving) in enumerate(better_deals[:10]):
                 name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
-                logger.info(f"{i+1}. {name} ({item['product_type']})")
-                logger.info(f"   igold price: {item['sell_price_bgn']} BGN")
-                logger.info(f"   Tavex price: {item['tavex_sell_price_bgn']} BGN")
-                logger.info(f"   Savings: {saving:.2f}%")
+                logger.info("%d. %s (%s)", i+1, name, item['product_type'])
+                logger.info("   igold price: %s BGN", item['sell_price_bgn'])
+                logger.info("   Tavex price: %s BGN", item['tavex_sell_price_bgn'])
+                logger.info("   Savings: %.2f%%", saving)
                 logger.info("")
 
     # Show top 5 cheapest per gram and most expensive per gram
     if with_price_per_gram:
-        logger.info(f"\n=== TOP 10 CHEAPEST PER GRAM (BGN) ===")
+        logger.info("\n=== TOP 10 CHEAPEST PER GRAM (BGN) ===")
         for i, item in enumerate(with_price_per_gram[:10]):
             name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
-            logger.info(f"{i+1}. {name} ({item['product_type']})")
-            logger.info(f"   Price per gram: {item['price_per_g_fine_bgn']} BGN")
-            logger.info(f"   Total price: {item['buy_price_bgn']} BGN")
-            logger.info(f"   Fine gold: {item['fine_gold_g']} g")
+            logger.info("%d. %s (%s)", i+1, name, item['product_type'])
+            logger.info("   Price per gram: %s BGN", item['price_per_g_fine_bgn'])
+            logger.info("   Total price: %s BGN", item['buy_price_bgn'])
+            logger.info("   Fine gold: %s g", item['fine_gold_g'])
             logger.info("")
-        
-        logger.info(f"=== TOP 3 MOST EXPENSIVE PER GRAM (BGN) ===")
+
+        logger.info("=== TOP 3 MOST EXPENSIVE PER GRAM (BGN) ===")
         for i, item in enumerate(with_price_per_gram[-3:][::-1]):  # Last 5, reversed
             name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
-            logger.info(f"{i+1}. {name} ({item['product_type']})")
-            logger.info(f"   Price per gram: {item['price_per_g_fine_bgn']} BGN")
-            logger.info(f"   Total price: {item['buy_price_bgn']} BGN")
-            logger.info(f"   Fine gold: {item['fine_gold_g']} g")
+            logger.info("%d. %s (%s)", i+1, name, item['product_type'])
+            logger.info("   Price per gram: %s BGN", item['price_per_g_fine_bgn'])
+            logger.info("   Total price: %s BGN", item['buy_price_bgn'])
+            logger.info("   Fine gold: %s g", item['fine_gold_g'])
             logger.info("")
-        
+
         # Show separately for bars and coins
         if bars and len([b for b in bars if b.get('price_per_g_fine_bgn')]) >= 3:
-            logger.info(f"\n=== TOP 10 CHEAPEST GOLD BARS PER GRAM (BGN) ===")
+            logger.info("\n=== TOP 10 CHEAPEST GOLD BARS PER GRAM (BGN) ===")
             bars_with_price = [b for b in bars if b.get('price_per_g_fine_bgn')]
             bars_with_price.sort(key=lambda x: x['price_per_g_fine_bgn'])
             for i, item in enumerate(bars_with_price[:10]):
                 name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
-                logger.info(f"{i+1}. {name}")
-                logger.info(f"   Price per gram: {item['price_per_g_fine_bgn']} BGN")
-                logger.info(f"   Total price: {item['buy_price_bgn']} BGN")
-                logger.info(f"   Weight: {item['total_weight_g']} g")
+                logger.info("%d. %s", i+1, name)
+                logger.info("   Price per gram: %s BGN", item['price_per_g_fine_bgn'])
+                logger.info("   Total price: %s BGN", item['buy_price_bgn'])
+                logger.info("   Weight: %s g", item['total_weight_g'])
                 logger.info("")
-                
+
         if coins and len([c for c in coins if c.get('price_per_g_fine_bgn')]) >= 3:
-            logger.info(f"\n=== TOP 10 CHEAPEST GOLD COINS PER GRAM (BGN) ===")
+            logger.info("\n=== TOP 10 CHEAPEST GOLD COINS PER GRAM (BGN) ===")
             coins_with_price = [c for c in coins if c.get('price_per_g_fine_bgn')]
             coins_with_price.sort(key=lambda x: x['price_per_g_fine_bgn'])
             for i, item in enumerate(coins_with_price[:10]):
                 name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
-                logger.info(f"{i+1}. {name}")
-                logger.info(f"   Price per gram: {item['price_per_g_fine_bgn']} BGN")
-                logger.info(f"   Total price: {item['buy_price_bgn']} BGN")
-                logger.info(f"   Weight: {item['total_weight_g']} g")
+                logger.info("%d. %s", i+1, name)
+                logger.info("   Price per gram: %s BGN", item['price_per_g_fine_bgn'])
+                logger.info("   Total price: %s BGN", item['buy_price_bgn'])
+                logger.info("   Weight: %s g", item['total_weight_g'])
                 logger.info("")
 
     # Show spread analysis
@@ -511,22 +514,22 @@ def main():
         # Sort by spread for analysis
         spread_sorted = sorted(with_spread, key=lambda x: x['spread_percentage'])
 
-        logger.info(f"\n=== TOP 5 PRODUCTS WITH LOWEST SPREAD ===")
+        logger.info("\n=== TOP 5 PRODUCTS WITH LOWEST SPREAD ===")
         for i, item in enumerate(spread_sorted[:5]):
             name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
-            logger.info(f"{i+1}. {name} ({item['product_type']})")
-            logger.info(f"   Spread: {item['spread_percentage']}%")
-            logger.info(f"   Buy price: {item['buy_price_bgn']} BGN")
-            logger.info(f"   Sell price: {item['sell_price_bgn']} BGN")
+            logger.info("%d. %s (%s)", i+1, name, item['product_type'])
+            logger.info("   Spread: %s%%", item['spread_percentage'])
+            logger.info("   Buy price: %s BGN", item['buy_price_bgn'])
+            logger.info("   Sell price: %s BGN", item['sell_price_bgn'])
             logger.info("")
 
-        logger.info(f"\n=== TOP 5 PRODUCTS WITH HIGHEST SPREAD ===")
+        logger.info("\n=== TOP 5 PRODUCTS WITH HIGHEST SPREAD ===")
         for i, item in enumerate(spread_sorted[-5:][::-1]):  # Last 5, reversed
             name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
-            logger.info(f"{i+1}. {name} ({item['product_type']})")
-            logger.info(f"   Spread: {item['spread_percentage']}%")
-            logger.info(f"   Buy price: {item['buy_price_bgn']} BGN")
-            logger.info(f"   Sell price: {item['sell_price_bgn']} BGN")
+            logger.info("%d. %s (%s)", i+1, name, item['product_type'])
+            logger.info("   Spread: %s%%", item['spread_percentage'])
+            logger.info("   Buy price: %s BGN", item['buy_price_bgn'])
+            logger.info("   Sell price: %s BGN", item['sell_price_bgn'])
             logger.info("")
 
         # If comparing with Tavex, show spread comparison
@@ -534,12 +537,12 @@ def main():
             with_both_spreads = [r for r in results if r.get('spread_percentage') is not None and r.get('tavex_spread_percentage') is not None]
             better_spread_than_tavex = [r for r in with_both_spreads if r['spread_percentage'] < r['tavex_spread_percentage']]
 
-            logger.info(f"\n=== SPREAD COMPARISON WITH TAVEX ===")
-            logger.info(f"Products with both spreads: {len(with_both_spreads)}")
-            logger.info(f"Products with better spread at igold: {len(better_spread_than_tavex)}/{len(with_both_spreads)}")
+            logger.info("\n=== SPREAD COMPARISON WITH TAVEX ===")
+            logger.info("Products with both spreads: %d", len(with_both_spreads))
+            logger.info("Products with better spread at igold: %d/%d", len(better_spread_than_tavex), len(with_both_spreads))
 
             if better_spread_than_tavex:
-                logger.info(f"\n=== TOP 5 BETTER SPREADS AT IGOLD ===")
+                logger.info("\n=== TOP 5 BETTER SPREADS AT IGOLD ===")
                 # Sort by spread difference (biggest difference first)
                 better_spreads = []
                 for item in better_spread_than_tavex:
@@ -550,10 +553,10 @@ def main():
 
                 for i, (item, spread_diff) in enumerate(better_spreads[:5]):
                     name = item['product_name'][:60] + "..." if len(item['product_name'] or '') > 60 else item['product_name']
-                    logger.info(f"{i+1}. {name} ({item['product_type']})")
-                    logger.info(f"   igold spread: {item['spread_percentage']}%")
-                    logger.info(f"   Tavex spread: {item['tavex_spread_percentage']}%")
-                    logger.info(f"   Difference: {spread_diff:.2f}%")
+                    logger.info("%d. %s (%s)", i+1, name, item['product_type'])
+                    logger.info("   igold spread: %s%%", item['spread_percentage'])
+                    logger.info("   Tavex spread: %s%%", item['tavex_spread_percentage'])
+                    logger.info("   Difference: %.2f%%", spread_diff)
                     logger.info("")
 
 if __name__ == '__main__':
