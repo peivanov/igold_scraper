@@ -1,0 +1,25 @@
+{
+  "report_type": "daily",
+  "metal_type": "silver",
+  "report_date": "2026-01-29",
+  "statistics": {
+    "today_date": "2026-01-29",
+    "yesterday_date": "2026-01-28",
+    "top_5_count": 0,
+    "average_price_per_gram": 0,
+    "yesterday_average": null,
+    "price_change_pct": 0,
+    "trend": "stable",
+    "product_types": {
+      "bars": 0,
+      "coins": 0
+    },
+    "new_products_count": 2,
+    "total_products_today": 58,
+    "best_deals": [],
+    "affordable_deals": [],
+    "live_price_today": null,
+    "live_price_yesterday": null,
+    "live_price_change_pct": null
+  }
+}
