@@ -24,38 +24,26 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.11'
         
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        
-    - name: Create data directories
-      run: |
-        mkdir -p data/gold
-        mkdir -p data/silver
-        mkdir -p data/statistics
-        mkdir -p data/live_prices/gold
-        mkdir -p data/live_prices/silver
-        mkdir -p scripts
+        pip install -e .
         
     - name: Fetch live precious metals prices
       env:
         PRECIOUS_METALS_API_BASE: ${{ secrets.PRECIOUS_METALS_API_BASE }}
       run: |
-        if [ -f "scripts/live_gold_price.py" ]; then
-          python scripts/live_gold_price.py --metals XAU XAG
-        else
-          echo "Live price script not found, skipping"
-        fi
+        python -m igold_scraper.services.live_price --metals XAU XAG || echo "Live price fetch failed, continuing..."
       continue-on-error: true
         
     - name: Run Gold Scraper
       id: gold-scraper
       run: |
-        echo "Running gold scraper with Tavex comparison..."
-        python igold_scraper.py --compare-tavex --add-timestamp || echo "Gold scraper failed but continuing..."
+        echo "Running gold scraper..."
+        python -m igold_scraper.scrapers.gold || echo "Gold scraper failed but continuing..."
         echo "Gold scraping step completed"
       continue-on-error: true
       
@@ -63,59 +51,32 @@ jobs:
       id: silver-scraper
       run: |
         echo "Running silver scraper..."
-        python igold_silver_scraper.py --add-timestamp || echo "Silver scraper failed but continuing..."
+        python -m igold_scraper.scrapers.silver || echo "Silver scraper failed but continuing..."
         echo "Silver scraping step completed"
       continue-on-error: true
       
-    - name: Convert CSV to JSON and organize data
-      run: |
-        if [ -f "scripts/data_manager.py" ]; then
-          python scripts/data_manager.py
-        else
-          echo "Data manager script not found, skipping data organization"
-        fi
-        
     - name: Analyze price changes and send notifications
       env:
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         PRICE_CHANGE_THRESHOLD: ${{ secrets.PRICE_CHANGE_THRESHOLD || '5.0' }}
       run: |
-        if [ -f "scripts/price_tracker.py" ]; then
-          python scripts/price_tracker.py
-        else
-          echo "Price tracker script not found, skipping price analysis"
-        fi
+        python -m igold_scraper.services.price_tracker --metal both || echo "Price tracking failed, continuing..."
+      continue-on-error: true
     
     - name: Generate and send daily market reports
       env:
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       run: |
-        if [ -f "scripts/daily_report_generator.py" ]; then
-          python scripts/daily_report_generator.py
-        else
-          echo "Daily report generator script not found, skipping daily reports"
-        fi
-        
-    - name: Clean up old data (if script exists)
-      run: |
-        if [ -f "scripts/data_manager.py" ]; then
-          python scripts/data_manager.py --cleanup
-        else
-          echo "Data manager script not found, skipping cleanup"
-        fi
+        python -m igold_scraper.services.reports || echo "Report generation failed, continuing..."
+      continue-on-error: true
         
     - name: Commit and push results
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         
-        # Add any CSV files created by scrapers
-        git add *.csv 2>/dev/null || true
-        
-        # Add data directory if it exists
-        if [ -d "data" ]; then
-          git add data/
-        fi
+        # Add database and data directory
+        git add data/
         
         # Check if there are changes to commit
         if [ -n "$(git status --porcelain)" ]; then
