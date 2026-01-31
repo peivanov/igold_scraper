@@ -1,0 +1,30 @@
+[
+  {
+    "timestamp": "2026-01-30T22:00:00.044000",
+    "date": "2026-01-31",
+    "metal": "XAG",
+    "metal_name": "silver",
+    "source": "Live XAG/EUR Market Data",
+    "platform": "MarketData",
+    "spread_profile": "standard",
+    "prices": {
+      "eur_per_oz": {
+        "bid": 71.32,
+        "ask": 71.61,
+        "mid": 71.46,
+        "spread": 4.4
+      },
+      "eur_per_gram": {
+        "bid": 2.29,
+        "ask": 2.3,
+        "mid": 2.3
+      },
+      "bgn_per_gram": {
+        "bid": 4.48,
+        "ask": 4.5,
+        "mid": 4.49
+      }
+    },
+    "eur_to_bgn_rate": 1.9558
+  }
+]
