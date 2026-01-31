@@ -24,44 +24,33 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.9'
+        python-version: '3.11'
         
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
-        
-    - name: Create directories
-      run: |
-        mkdir -p data/gold
-        mkdir -p data/silver
-        mkdir -p data/statistics
+        pip install -e .
         
     - name: Generate weekly statistics
       env:
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       run: |
-        if [ -f "scripts/statistics_generator.py" ]; then
-          python scripts/statistics_generator.py --period weekly
-        else
-          echo "Statistics generator script not found"
-        fi
+        python -m igold_scraper.services.statistics --period weekly || echo "Weekly stats generation failed"
+      continue-on-error: true
         
     - name: Generate monthly statistics (first Sunday of month)
       env:
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       run: |
-        if [ -f "scripts/statistics_generator.py" ]; then
-          # Check if it's the first Sunday of the month
-          day_of_month=$(date +%d)
-          if [ "$day_of_month" -le 7 ]; then
-            python scripts/statistics_generator.py --period monthly
-          else
-            echo "Not the first Sunday of the month, skipping monthly report"
-          fi
+        # Check if it's the first Sunday of the month
+        day_of_month=$(date +%d)
+        if [ "$day_of_month" -le 7 ]; then
+          python -m igold_scraper.services.statistics --period monthly || echo "Monthly stats generation failed"
         else
-          echo "Statistics generator script not found"
+          echo "Not the first Sunday of the month, skipping monthly report"
         fi
+      continue-on-error: true
       
     - name: Commit statistics
       run: |
