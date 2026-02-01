@@ -203,16 +203,20 @@ class DailyReportGenerator:
                 AND ph.timestamp >= ?
                 AND ph.timestamp <= ?
                 AND ph.sell_price_eur > 0
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) >= 
+                    CASE WHEN ? = 'gold' THEN 70 ELSE 1.0 END
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) <= 
+                    CASE WHEN ? = 'gold' THEN 250 ELSE 20.0 END
             )
             SELECT
-                AVG(price_per_g_fine_eur) as avg_price,
-                MIN(price_per_g_fine_eur) as min_price,
-                MAX(price_per_g_fine_eur) as max_price,
+                COALESCE(AVG(price_per_g_fine_eur), 0) as avg_price,
+                COALESCE(MIN(price_per_g_fine_eur), 0) as min_price,
+                COALESCE(MAX(price_per_g_fine_eur), 0) as max_price,
                 COUNT(*) as product_count
             FROM LatestPrices
             WHERE rn = 1
         """,
-            (metal_type, timestamp_start, timestamp_end),
+            (metal_type, timestamp_start, timestamp_end, metal_type, metal_type),
         )
 
         row = cursor.fetchone()
@@ -222,6 +226,71 @@ class DailyReportGenerator:
             "max": round(row["max_price"], 2) if row["max_price"] else 0,
             "count": row["product_count"],
         }
+
+    def get_comparable_average(
+        self,
+        metal_type: str,
+        period1_start: int,
+        period1_end: int,
+        period2_start: int,
+        period2_end: int
+    ) -> float:
+        """
+        Get average price for products that exist in BOTH time periods.
+        This prevents fake drops when comparing different product sets.
+        
+        Returns average price per gram for period1, considering only products present in period2.
+        """
+        cursor = self.db.conn.execute(
+            """
+            WITH Period1Products AS (
+                SELECT DISTINCT p.id
+                FROM products p
+                JOIN price_history ph ON p.id = ph.product_id
+                WHERE p.metal_type = ?
+                AND ph.timestamp >= ? AND ph.timestamp <= ?
+            ),
+            Period2Products AS (
+                SELECT DISTINCT p.id
+                FROM products p
+                JOIN price_history ph ON p.id = ph.product_id
+                WHERE p.metal_type = ?
+                AND ph.timestamp >= ? AND ph.timestamp <= ?
+            ),
+            CommonProducts AS (
+                SELECT p1.id
+                FROM Period1Products p1
+                INNER JOIN Period2Products p2 ON p1.id = p2.id
+            ),
+            LatestPrices AS (
+                SELECT
+                    p.id,
+                    (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) as price_per_g_fine_eur,
+                    ROW_NUMBER() OVER (PARTITION BY p.id ORDER BY ph.timestamp DESC) as rn
+                FROM products p
+                JOIN price_history ph ON p.id = ph.product_id
+                JOIN CommonProducts cp ON p.id = cp.id
+                WHERE p.metal_type = ?
+                AND ph.timestamp >= ? AND ph.timestamp <= ?
+                AND ph.sell_price_eur > 0
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) >= 
+                    CASE WHEN ? = 'gold' THEN 70 ELSE 1.0 END
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) <= 
+                    CASE WHEN ? = 'gold' THEN 250 ELSE 20.0 END
+            )
+            SELECT COALESCE(AVG(price_per_g_fine_eur), 0) as avg_price
+            FROM LatestPrices
+            WHERE rn = 1
+        """,
+            (
+                metal_type, period1_start, period1_end,
+                metal_type, period2_start, period2_end,
+                metal_type, period1_start, period1_end, metal_type, metal_type
+            ),
+        )
+        
+        row = cursor.fetchone()
+        return round(row["avg_price"], 2) if row["avg_price"] else 0
 
     def get_price_movers(
         self,
@@ -251,6 +320,10 @@ class DailyReportGenerator:
                 WHERE p.metal_type = ?
                 AND ph.timestamp >= ? AND ph.timestamp <= ?
                 AND ph.sell_price_eur > 0
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) >= 
+                    CASE WHEN ? = 'gold' THEN 70 ELSE 1.0 END
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) <= 
+                    CASE WHEN ? = 'gold' THEN 250 ELSE 20.0 END
             ),
             YesterdayPrices AS (
                 SELECT
@@ -262,6 +335,10 @@ class DailyReportGenerator:
                 WHERE p.metal_type = ?
                 AND ph.timestamp >= ? AND ph.timestamp <= ?
                 AND ph.sell_price_eur > 0
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) >= 
+                    CASE WHEN ? = 'gold' THEN 70 ELSE 1.0 END
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) <= 
+                    CASE WHEN ? = 'gold' THEN 250 ELSE 20.0 END
             )
             SELECT
                 t.id,
@@ -274,9 +351,11 @@ class DailyReportGenerator:
             JOIN YesterdayPrices y ON t.id = y.id
             WHERE t.rn = 1 AND y.rn = 1
             AND y.yesterday_price > 0
+            AND ABS((t.today_price - y.yesterday_price) / y.yesterday_price * 100) <= 50
             ORDER BY change_pct DESC
         """,
-            (metal_type, today_start, today_end, metal_type, yesterday_start, yesterday_end),
+            (metal_type, today_start, today_end, metal_type, metal_type, 
+             metal_type, yesterday_start, yesterday_end, metal_type, metal_type),
         )
 
         all_movers = [dict(row) for row in cursor.fetchall()]
@@ -289,32 +368,40 @@ class DailyReportGenerator:
         return increases, decreases
 
     def get_new_products(
-        self, metal_type: str, today_start: int, today_end: int, yesterday_start: int, yesterday_end: int
+        self, metal_type: str, today_start: int, today_end: int
     ) -> List[Dict]:
-        """Get products that have prices today but not yesterday."""
+        """Get products that were first seen within the last 7 days (truly new listings)."""
+        # Calculate 7 days ago timestamp
+        seven_days_ago = today_start - (7 * 24 * 60 * 60)
+        
         cursor = self.db.conn.execute(
             """
+            WITH FirstSeen AS (
+                SELECT 
+                    p.id,
+                    p.product_name,
+                    p.url,
+                    MIN(ph.timestamp) as first_timestamp
+                FROM products p
+                JOIN price_history ph ON p.id = ph.product_id
+                WHERE p.metal_type = ?
+                GROUP BY p.id
+            )
             SELECT DISTINCT
-                p.id,
-                p.product_name,
-                p.url,
+                fs.id,
+                fs.product_name,
+                fs.url,
                 (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) as price_per_g_fine_eur,
                 ph.sell_price_eur
-            FROM products p
+            FROM FirstSeen fs
+            JOIN products p ON fs.id = p.id
             JOIN price_history ph ON p.id = ph.product_id
-            WHERE p.metal_type = ?
+            WHERE fs.first_timestamp >= ?
             AND ph.timestamp >= ? AND ph.timestamp <= ?
-            AND p.id NOT IN (
-                SELECT DISTINCT p2.id
-                FROM products p2
-                JOIN price_history ph2 ON p2.id = ph2.product_id
-                WHERE p2.metal_type = ?
-                AND ph2.timestamp >= ? AND ph2.timestamp <= ?
-            )
             ORDER BY price_per_g_fine_eur ASC
             LIMIT 10
         """,
-            (metal_type, today_start, today_end, metal_type, yesterday_start, yesterday_end),
+            (metal_type, seven_days_ago, today_start, today_end),
         )
 
         return [dict(row) for row in cursor.fetchall()]
@@ -362,8 +449,8 @@ class DailyReportGenerator:
             "products": products,
         }
 
-    def load_live_price(self, metal_type: str, date: datetime) -> Optional[float]:
-        """Load live price for a specific date"""
+    def load_live_price(self, metal_type: str, date: datetime) -> Optional[Dict]:
+        """Load live price data for a specific date"""
         date_str = date.strftime("%Y-%m-%d")
         file_path = self.data_dir / "live_prices" / metal_type / f"{date_str}.json"
 
@@ -377,7 +464,14 @@ class DailyReportGenerator:
                 if isinstance(data, list) and len(data) > 0:
                     data = data[0]  # Take first entry if it's an array
                 if isinstance(data, dict):
-                    return data.get("price_eur_per_g")
+                    prices = data.get("prices", {})
+                    # Return full data object with bid/ask/spread
+                    return {
+                        "price_eur_per_g": data.get("price_eur_per_g") or prices.get("eur_per_gram", {}).get("mid"),
+                        "source": data.get("source"),
+                        "platform": data.get("platform"),
+                        "prices": prices
+                    }
                 return None
         except (OSError, json.JSONDecodeError) as e:
             logger.exception("Error loading live price from %s: %s", file_path, e)
@@ -387,8 +481,8 @@ class DailyReportGenerator:
         self,
         today: datetime,
         yesterday: datetime,
-        today_live_price: Optional[float],
-        yesterday_live_price: Optional[float],
+        today_live_price: Optional[Dict],
+        yesterday_live_price: Optional[Dict],
         metal_type: str = "gold",
     ) -> Dict:
         """
@@ -397,8 +491,8 @@ class DailyReportGenerator:
         Args:
             today: Today's date
             yesterday: Yesterday's date
-            today_live_price: Live metal price today (per gram)
-            yesterday_live_price: Live metal price yesterday (per gram)
+            today_live_price: Live metal price data today (dict with prices, bid/ask, etc.)
+            yesterday_live_price: Live metal price data yesterday (dict with prices, bid/ask, etc.)
             metal_type: 'gold' or 'silver'
 
         Returns:
@@ -413,6 +507,20 @@ class DailyReportGenerator:
         today_stats = self.get_market_statistics(metal_type, today_start, today_end)
         yesterday_stats = self.get_market_statistics(metal_type, yesterday_start, yesterday_end)
         week_ago_stats = self.get_market_statistics(metal_type, week_ago_start, week_ago_end)
+        
+        # Get comparable statistics (only products that exist in both periods)
+        comparable_today_avg = self.get_comparable_average(
+            metal_type, today_start, today_end, yesterday_start, yesterday_end
+        )
+        comparable_yesterday_avg = self.get_comparable_average(
+            metal_type, yesterday_start, yesterday_end, today_start, today_end
+        )
+        comparable_week_today_avg = self.get_comparable_average(
+            metal_type, today_start, today_end, week_ago_start, week_ago_end
+        )
+        comparable_week_ago_avg = self.get_comparable_average(
+            metal_type, week_ago_start, week_ago_end, today_start, today_end
+        )
 
         # Get top 5 products for today
         today_top_5 = self.get_top_products(metal_type, today_start, today_end, top_n=5)
@@ -421,13 +529,13 @@ class DailyReportGenerator:
         bars_count = sum(1 for p in today_top_5 if p.get("product_type") == "bar")
         coins_count = sum(1 for p in today_top_5 if p.get("product_type") == "coin")
 
-        # Calculate price changes
+        # Calculate price changes using comparable averages (only products in both periods)
         price_change_pct = 0
         week_price_change_pct = 0
         trend = "stable"
 
-        if yesterday_stats["avg"] > 0:
-            price_change_pct = (today_stats["avg"] - yesterday_stats["avg"]) / yesterday_stats["avg"] * 100
+        if comparable_yesterday_avg > 0 and comparable_today_avg > 0:
+            price_change_pct = (comparable_today_avg - comparable_yesterday_avg) / comparable_yesterday_avg * 100
 
             # Determine trend
             if abs(price_change_pct) < 1.0:
@@ -437,15 +545,15 @@ class DailyReportGenerator:
             else:
                 trend = "decreasing"
 
-        if week_ago_stats["avg"] > 0:
-            week_price_change_pct = (today_stats["avg"] - week_ago_stats["avg"]) / week_ago_stats["avg"] * 100
+        if comparable_week_ago_avg > 0 and comparable_week_today_avg > 0:
+            week_price_change_pct = (comparable_week_today_avg - comparable_week_ago_avg) / comparable_week_ago_avg * 100
 
         # Get product counts
         total_products_today = self.get_product_count(metal_type, today_start, today_end)
         total_products_yesterday = self.get_product_count(metal_type, yesterday_start, yesterday_end)
 
-        # Get new products
-        new_products = self.get_new_products(metal_type, today_start, today_end, yesterday_start, yesterday_end)
+        # Get new products (first seen within last 7 days)
+        new_products = self.get_new_products(metal_type, today_start, today_end)
 
         # Get price movers
         price_increases, price_decreases = self.get_price_movers(
@@ -454,8 +562,11 @@ class DailyReportGenerator:
 
         # Live price comparison
         live_price_change_pct = 0
-        if today_live_price and yesterday_live_price:
-            live_price_change_pct = (today_live_price - yesterday_live_price) / yesterday_live_price * 100
+        today_live_price_value = today_live_price.get("price_eur_per_g") if today_live_price else None
+        yesterday_live_price_value = yesterday_live_price.get("price_eur_per_g") if yesterday_live_price else None
+        
+        if today_live_price_value and yesterday_live_price_value:
+            live_price_change_pct = (today_live_price_value - yesterday_live_price_value) / yesterday_live_price_value * 100
 
         # Get affordable deals
         price_limit = 2500 if metal_type == "gold" else 1000
@@ -486,11 +597,11 @@ class DailyReportGenerator:
             # Price movers
             "price_increases": price_increases,
             "price_decreases": price_decreases,
-            # Live prices
+            # Live prices (full data with bid/ask/spread)
             "live_price_today": today_live_price,
             "live_price_yesterday": yesterday_live_price,
             "live_price_change_pct": (
-                round(live_price_change_pct, 2) if today_live_price and yesterday_live_price else None
+                round(live_price_change_pct, 2) if today_live_price_value and yesterday_live_price_value else None
             ),
         }
 
@@ -533,7 +644,7 @@ class DailyReportGenerator:
             # Add hyperlink to product name if URL available
             full_url = f"https://igold.bg{url}" if url and url.startswith('/') else url
             name_display = f"[{name}]({full_url})" if full_url else f"**{name}**"
-            deal_line = f"{type_emoji} {i}. {name_display}\n   {price_per_g:.2f} €/g | Total: {sell_price:.0f} €{spread_text}"
+            deal_line = f"{type_emoji} **{i}.** {name_display}\n   {price_per_g:.2f} €/g | Total: {sell_price:.0f} €{spread_text}"
             best_deals_text += deal_line + "\n"
 
         # Build affordable deals
@@ -559,18 +670,23 @@ class DailyReportGenerator:
                 # Add hyperlink to product name if URL available
                 full_url = f"https://igold.bg{url}" if url and url.startswith('/') else url
                 name_display = f"[{name}]({full_url})" if full_url else f"**{name}**"
-                deal_line = f"{type_emoji} {i}. {name_display}\n   {price_per_g:.2f} €/g | {sell_price:.0f} €{spread_text}"
+                deal_line = f"{type_emoji} **{i}.** {name_display}\n   {price_per_g:.2f} €/g | {sell_price:.0f} €{spread_text}"
                 affordable_text += deal_line + "\n"
 
         # Build price movers (biggest decreases - good for buyers!)
         price_drops_text = ""
         if stats.get("price_decreases"):
             for i, mover in enumerate(stats["price_decreases"][:5], 1):
-                name = mover["product_name"][:50]
+                name = mover["product_name"][:45]
+                url = mover.get("url", "")
                 change = mover["change_pct"]
                 today_price = mover["today_price"]
 
-                drop_line = f"{i}. **{name}**\n   {change:.1f}% drop → {today_price:.2f} €/g"
+                # Add hyperlink to product name if URL available
+                full_url = f"https://igold.bg{url}" if url and url.startswith('/') else url
+                name_display = f"[{name}]({full_url})" if full_url else f"**{name}**"
+                
+                drop_line = f"**{i}.** {name_display} 💸 {change:.1f}% → {today_price:.2f} €/g"
                 price_drops_text += drop_line + "\n"
 
         # Build embed fields
@@ -595,17 +711,36 @@ class DailyReportGenerator:
             },
         ]
 
-        # Add live price if available
+        # Add detailed live market price if available
         if stats.get("live_price_today"):
-            live_change = stats.get("live_price_change_pct", 0)
-            live_emoji = "📈" if live_change > 0 else "📉" if live_change < 0 else "➡️"
-            fields.append(
-                {
-                    "name": "🌍 Live Spot Price",
-                    "value": (f"{stats['live_price_today']:.2f} €/g\n" f"Change: {live_emoji} {live_change:+.2f}%"),
-                    "inline": True,
-                }
+            live_data = stats["live_price_today"]
+            
+            # Extract price data
+            prices = live_data.get("prices", {})
+            eur_per_gram = prices.get("eur_per_gram", {})
+            eur_per_oz = prices.get("eur_per_oz", {})
+            
+            # Get mid, bid, ask in EUR
+            mid_eur = eur_per_gram.get("mid", 0)
+            bid_eur = eur_per_gram.get("bid", 0)
+            ask_eur = eur_per_gram.get("ask", 0)
+            spread_eur_oz = eur_per_oz.get("spread", 0)
+            
+            source = live_data.get("source", "Live Market Data")
+            
+            metal_emoji = "💰" if metal_type == "gold" else "🪙"
+            live_price_text = (
+                f"**Current:** {mid_eur:.2f} EUR/g\n"
+                f"**Bid/Ask:** {bid_eur:.2f} / {ask_eur:.2f} EUR/g\n"
+                f"**Spread:** {spread_eur_oz:.1f} EUR/oz\n"
+                f"**Source:** {source}"
             )
+            
+            fields.insert(0, {
+                "name": f"{metal_emoji} Live {metal_name} Market Price",
+                "value": live_price_text,
+                "inline": False,
+            })
 
         # Add new products if any
         if stats["new_products_count"] > 0:
