@@ -203,16 +203,20 @@ class DailyReportGenerator:
                 AND ph.timestamp >= ?
                 AND ph.timestamp <= ?
                 AND ph.sell_price_eur > 0
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) >= 
+                    CASE WHEN ? = 'gold' THEN 70 ELSE 1.0 END
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) <= 
+                    CASE WHEN ? = 'gold' THEN 250 ELSE 20.0 END
             )
             SELECT
-                AVG(price_per_g_fine_eur) as avg_price,
-                MIN(price_per_g_fine_eur) as min_price,
-                MAX(price_per_g_fine_eur) as max_price,
+                COALESCE(AVG(price_per_g_fine_eur), 0) as avg_price,
+                COALESCE(MIN(price_per_g_fine_eur), 0) as min_price,
+                COALESCE(MAX(price_per_g_fine_eur), 0) as max_price,
                 COUNT(*) as product_count
             FROM LatestPrices
             WHERE rn = 1
         """,
-            (metal_type, timestamp_start, timestamp_end),
+            (metal_type, timestamp_start, timestamp_end, metal_type, metal_type),
         )
 
         row = cursor.fetchone()
@@ -222,6 +226,71 @@ class DailyReportGenerator:
             "max": round(row["max_price"], 2) if row["max_price"] else 0,
             "count": row["product_count"],
         }
+
+    def get_comparable_average(
+        self,
+        metal_type: str,
+        period1_start: int,
+        period1_end: int,
+        period2_start: int,
+        period2_end: int
+    ) -> float:
+        """
+        Get average price for products that exist in BOTH time periods.
+        This prevents fake drops when comparing different product sets.
+        
+        Returns average price per gram for period1, considering only products present in period2.
+        """
+        cursor = self.db.conn.execute(
+            """
+            WITH Period1Products AS (
+                SELECT DISTINCT p.id
+                FROM products p
+                JOIN price_history ph ON p.id = ph.product_id
+                WHERE p.metal_type = ?
+                AND ph.timestamp >= ? AND ph.timestamp <= ?
+            ),
+            Period2Products AS (
+                SELECT DISTINCT p.id
+                FROM products p
+                JOIN price_history ph ON p.id = ph.product_id
+                WHERE p.metal_type = ?
+                AND ph.timestamp >= ? AND ph.timestamp <= ?
+            ),
+            CommonProducts AS (
+                SELECT p1.id
+                FROM Period1Products p1
+                INNER JOIN Period2Products p2 ON p1.id = p2.id
+            ),
+            LatestPrices AS (
+                SELECT
+                    p.id,
+                    (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) as price_per_g_fine_eur,
+                    ROW_NUMBER() OVER (PARTITION BY p.id ORDER BY ph.timestamp DESC) as rn
+                FROM products p
+                JOIN price_history ph ON p.id = ph.product_id
+                JOIN CommonProducts cp ON p.id = cp.id
+                WHERE p.metal_type = ?
+                AND ph.timestamp >= ? AND ph.timestamp <= ?
+                AND ph.sell_price_eur > 0
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) >= 
+                    CASE WHEN ? = 'gold' THEN 70 ELSE 1.0 END
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) <= 
+                    CASE WHEN ? = 'gold' THEN 250 ELSE 20.0 END
+            )
+            SELECT COALESCE(AVG(price_per_g_fine_eur), 0) as avg_price
+            FROM LatestPrices
+            WHERE rn = 1
+        """,
+            (
+                metal_type, period1_start, period1_end,
+                metal_type, period2_start, period2_end,
+                metal_type, period1_start, period1_end, metal_type, metal_type
+            ),
+        )
+        
+        row = cursor.fetchone()
+        return round(row["avg_price"], 2) if row["avg_price"] else 0
 
     def get_price_movers(
         self,
@@ -413,6 +482,20 @@ class DailyReportGenerator:
         today_stats = self.get_market_statistics(metal_type, today_start, today_end)
         yesterday_stats = self.get_market_statistics(metal_type, yesterday_start, yesterday_end)
         week_ago_stats = self.get_market_statistics(metal_type, week_ago_start, week_ago_end)
+        
+        # Get comparable statistics (only products that exist in both periods)
+        comparable_today_avg = self.get_comparable_average(
+            metal_type, today_start, today_end, yesterday_start, yesterday_end
+        )
+        comparable_yesterday_avg = self.get_comparable_average(
+            metal_type, yesterday_start, yesterday_end, today_start, today_end
+        )
+        comparable_week_today_avg = self.get_comparable_average(
+            metal_type, today_start, today_end, week_ago_start, week_ago_end
+        )
+        comparable_week_ago_avg = self.get_comparable_average(
+            metal_type, week_ago_start, week_ago_end, today_start, today_end
+        )
 
         # Get top 5 products for today
         today_top_5 = self.get_top_products(metal_type, today_start, today_end, top_n=5)
@@ -421,13 +504,13 @@ class DailyReportGenerator:
         bars_count = sum(1 for p in today_top_5 if p.get("product_type") == "bar")
         coins_count = sum(1 for p in today_top_5 if p.get("product_type") == "coin")
 
-        # Calculate price changes
+        # Calculate price changes using comparable averages (only products in both periods)
         price_change_pct = 0
         week_price_change_pct = 0
         trend = "stable"
 
-        if yesterday_stats["avg"] > 0:
-            price_change_pct = (today_stats["avg"] - yesterday_stats["avg"]) / yesterday_stats["avg"] * 100
+        if comparable_yesterday_avg > 0 and comparable_today_avg > 0:
+            price_change_pct = (comparable_today_avg - comparable_yesterday_avg) / comparable_yesterday_avg * 100
 
             # Determine trend
             if abs(price_change_pct) < 1.0:
@@ -437,8 +520,8 @@ class DailyReportGenerator:
             else:
                 trend = "decreasing"
 
-        if week_ago_stats["avg"] > 0:
-            week_price_change_pct = (today_stats["avg"] - week_ago_stats["avg"]) / week_ago_stats["avg"] * 100
+        if comparable_week_ago_avg > 0 and comparable_week_today_avg > 0:
+            week_price_change_pct = (comparable_week_today_avg - comparable_week_ago_avg) / comparable_week_ago_avg * 100
 
         # Get product counts
         total_products_today = self.get_product_count(metal_type, today_start, today_end)
