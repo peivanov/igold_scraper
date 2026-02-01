@@ -644,7 +644,7 @@ class DailyReportGenerator:
             # Add hyperlink to product name if URL available
             full_url = f"https://igold.bg{url}" if url and url.startswith('/') else url
             name_display = f"[{name}]({full_url})" if full_url else f"**{name}**"
-            deal_line = f"{type_emoji} {i}. {name_display}\n   {price_per_g:.2f} €/g | Total: {sell_price:.0f} €{spread_text}"
+            deal_line = f"{type_emoji} **{i}.** {name_display}\n   💰 {price_per_g:.2f} €/g | Total: {sell_price:.0f} €{spread_text}"
             best_deals_text += deal_line + "\n"
 
         # Build affordable deals
@@ -670,18 +670,18 @@ class DailyReportGenerator:
                 # Add hyperlink to product name if URL available
                 full_url = f"https://igold.bg{url}" if url and url.startswith('/') else url
                 name_display = f"[{name}]({full_url})" if full_url else f"**{name}**"
-                deal_line = f"{type_emoji} {i}. {name_display}\n   {price_per_g:.2f} €/g | {sell_price:.0f} €{spread_text}"
+                deal_line = f"{type_emoji} **{i}.** {name_display}\n   💰 {price_per_g:.2f} €/g | {sell_price:.0f} €{spread_text}"
                 affordable_text += deal_line + "\n"
 
         # Build price movers (biggest decreases - good for buyers!)
         price_drops_text = ""
         if stats.get("price_decreases"):
             for i, mover in enumerate(stats["price_decreases"][:5], 1):
-                name = mover["product_name"][:50]
+                name = mover["product_name"][:45]
                 change = mover["change_pct"]
                 today_price = mover["today_price"]
 
-                drop_line = f"{i}. **{name}**\n   {change:.1f}% drop → {today_price:.2f} €/g"
+                drop_line = f"**{i}. {name}**\n   💸 {change:.1f}% drop → {today_price:.2f} €/g"
                 price_drops_text += drop_line + "\n"
 
         # Build embed fields
@@ -722,21 +722,14 @@ class DailyReportGenerator:
             spread_eur_oz = eur_per_oz.get("spread", 0)
             
             source = live_data.get("source", "Live Market Data")
-            platform = live_data.get("platform", "MarketData")
             
             metal_emoji = "💰" if metal_type == "gold" else "🪙"
             live_price_text = (
-                f"**Current Price**\n"
-                f"{mid_eur:.2f} EUR/g\n\n"
-                f"**Bid / Ask**\n"
-                f"{bid_eur:.2f} / {ask_eur:.2f} EUR/g\n\n"
-                f"**Source**\n"
-                f"{source}\n"
-                f"Platform: {platform}"
+                f"**Current:** {mid_eur:.2f} EUR/g\n"
+                f"**Bid/Ask:** {bid_eur:.2f} / {ask_eur:.2f} EUR/g\n"
+                f"**Spread:** {spread_eur_oz:.1f} EUR/oz\n"
+                f"**Source:** {source}"
             )
-            
-            if spread_eur_oz > 0:
-                live_price_text += f" | Spread: {spread_eur_oz:.1f} EUR/oz"
             
             fields.insert(0, {
                 "name": f"{metal_emoji} Live {metal_name} Market Price",
