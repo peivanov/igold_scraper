@@ -63,17 +63,10 @@ class IgoldGoldScraper(IgoldBaseScraper):
         product_urls = super().gather_product_links(category_url)
 
         # Filter out URLs to skip
-        filtered_urls = [
-            url for url in product_urls
-            if not any(skip_url in url for skip_url in self.urls_to_skip)
-        ]
+        filtered_urls = [url for url in product_urls if not any(skip_url in url for skip_url in self.urls_to_skip)]
 
         if len(filtered_urls) < len(product_urls):
-            logger.debug(
-                "Filtered out %d URLs from %s",
-                len(product_urls) - len(filtered_urls),
-                category_url
-            )
+            logger.debug("Filtered out %d URLs from %s", len(product_urls) - len(filtered_urls), category_url)
 
         return filtered_urls
 
@@ -121,7 +114,7 @@ def main() -> None:
 
             # Process each product
             for price_data in category_prices:
-                url = price_data['url']  # Already normalized to relative path
+                url = price_data["url"]  # Already normalized to relative path
 
                 # Skip URLs we don't want
                 if any(skip_url in url for skip_url in URLS_TO_SKIP):
@@ -129,7 +122,7 @@ def main() -> None:
                     continue
 
                 # Check if we already have this product's metadata
-                if not product_manager.product_exists(url, 'gold'):
+                if not product_manager.product_exists(url):
                     # First time seeing this product - scrape full page
                     logger.info("New product found: %s", url)
                     # Build full URL for scraping
@@ -137,7 +130,7 @@ def main() -> None:
                     product = scraper.extract_product_data(full_product_url)
 
                     if product:
-                        product.metal_type = 'gold'
+                        product.metal_type = "gold"
                         product.product_type = product_type
                         product_manager.save_product(product)
                         total_new += 1
@@ -149,10 +142,7 @@ def main() -> None:
 
                 # Add price entry (for both new and existing products)
                 product_manager.add_price_entry(
-                    url=url,
-                    metal_type='gold',
-                    sell_price_eur=price_data['sell_price_eur'],
-                    buy_price_eur=price_data['buy_price_eur']
+                    url=url, sell_price_eur=price_data["sell_price_eur"], buy_price_eur=price_data["buy_price_eur"]
                 )
                 total_updated += 1
 
@@ -160,12 +150,16 @@ def main() -> None:
     logger.info("New products added: %d", total_new)
 
     # Get latest prices for all products
-    latest_prices = product_manager.get_latest_prices('gold')
+    latest_prices = product_manager.get_latest_prices("gold")
 
     # Sort by price per gram (handle None values)
     sorted_products = sorted(
         latest_prices,
-        key=lambda x: x.get('price_per_g_fine_eur') if x.get('price_per_g_fine_eur') is not None else float('inf')
+        key=lambda x: (
+            x.get('price_per_g_fine_eur')
+            if x.get('price_per_g_fine_eur') is not None
+            else float('inf')
+        )
     )
 
     # Print summary statistics
@@ -175,32 +169,25 @@ def main() -> None:
     # Top 5 by price per gram
     logger.info("\nTop 5 Best Prices (per gram fine gold):")
     for i, item in enumerate(sorted_products[:5], 1):
-        name = item.get('product_name', '')
+        name = item.get("product_name", "")
         name = name[:60] + "..." if len(name) > 60 else name
-        logger.info("%d. %s (%s)", i, name, item.get('product_type', ''))
-        logger.info(
-            "   Price per gram: %.2f EUR",
-            item.get('price_per_g_fine_eur', 0)
-        )
-        logger.info(
-            "   Sell: %.2f EUR | Buy: %.2f EUR",
-            item.get('sell_price_eur', 0),
-            item.get('buy_price_eur', 0)
-        )
+        logger.info("%d. %s (%s)", i, name, item.get("product_type", ""))
+        logger.info("   Price per gram: %.2f EUR", item.get("price_per_g_fine_eur", 0))
+        logger.info("   Sell: %.2f EUR | Buy: %.2f EUR", item.get("sell_price_eur", 0), item.get("buy_price_eur", 0))
 
     # Top 5 by spread
     spread_sorted = sorted(
-        [p for p in sorted_products if p.get('spread_percentage') is not None],
-        key=lambda x: x.get('spread_percentage', 0)
+        [p for p in sorted_products if p.get("spread_percentage") is not None],
+        key=lambda x: x.get("spread_percentage", 0),
     )
 
     if spread_sorted:
         logger.info("\nTop 5 Best Spreads:")
         for i, item in enumerate(spread_sorted[:5], 1):
-            name = item.get('product_name', '')
+            name = item.get("product_name", "")
             name = name[:60] + "..." if len(name) > 60 else name
-            logger.info("%d. %s (%s)", i, name, item.get('product_type', ''))
-            logger.info("   Spread: %.2f%%", item.get('spread_percentage', 0))
+            logger.info("%d. %s (%s)", i, name, item.get("product_type", ""))
+            logger.info("   Spread: %.2f%%", item.get("spread_percentage", 0))
 
     scraper.cleanup()
 

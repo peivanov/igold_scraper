@@ -72,7 +72,7 @@ def main() -> None:
             url = price_data['url']  # Already normalized to relative path
 
             # Check if we already have this product's metadata
-            if not product_manager.product_exists(url, 'silver'):
+            if not product_manager.product_exists(url):
                 # First time seeing this product - scrape full page
                 logger.info("New product found: %s", url)
                 # Build full URL for scraping
@@ -93,7 +93,6 @@ def main() -> None:
             # Add price entry (for both new and existing products)
             product_manager.add_price_entry(
                 url=url,
-                metal_type='silver',
                 sell_price_eur=price_data['sell_price_eur'],
                 buy_price_eur=price_data['buy_price_eur']
             )
@@ -108,7 +107,11 @@ def main() -> None:
     # Sort by price per gram (handle None values)
     sorted_products = sorted(
         latest_prices,
-        key=lambda x: x.get('price_per_g_fine_eur') if x.get('price_per_g_fine_eur') is not None else float('inf')
+        key=lambda x: (
+            x.get('price_per_g_fine_eur')
+            if x.get('price_per_g_fine_eur') is not None
+            else float('inf')
+        )
     )
 
     # Print summary statistics

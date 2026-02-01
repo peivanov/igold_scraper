@@ -236,8 +236,14 @@ class DatabaseManager:
                 (p.total_weight_g * p.purity_per_mille / 1000.0) as fine_metal_g,
                 ph.sell_price_eur,
                 ph.buy_price_eur,
-                (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) as price_per_g_fine_eur,
-                ROUND((ph.sell_price_eur - ph.buy_price_eur) / ph.sell_price_eur * 100, 2) as spread_percentage
+                CASE 
+                    WHEN ph.sell_price_eur > 0 THEN (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0))
+                    ELSE NULL
+                END as price_per_g_fine_eur,
+                CASE
+                    WHEN ph.sell_price_eur > 0 THEN ROUND((ph.sell_price_eur - ph.buy_price_eur) / ph.sell_price_eur * 100, 2)
+                    ELSE NULL
+                END as spread_percentage
             FROM products p
             LEFT JOIN price_history ph ON p.id = ph.product_id
             WHERE p.metal_type = ?

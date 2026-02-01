@@ -62,37 +62,38 @@ class PriceTracker:
         cursor = self.db.conn.execute("""
             WITH latest_prices AS (
                 SELECT
-                    product_id,
-                    sell_price_eur as current_price,
-                    price_per_g_fine_eur as current_price_per_g,
-                    timestamp as current_timestamp,
-                    ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY timestamp DESC) as rn
-                FROM price_history
-                WHERE timestamp >= ?
+                    ph.product_id,
+                    ph.sell_price_eur as current_price,
+                    ph.timestamp as current_timestamp,
+                    ROW_NUMBER() OVER (PARTITION BY ph.product_id ORDER BY ph.timestamp DESC) as rn
+                FROM price_history ph
+                WHERE ph.timestamp >= ?
             ),
             earliest_prices AS (
                 SELECT
-                    product_id,
-                    sell_price_eur as previous_price,
-                    price_per_g_fine_eur as previous_price_per_g,
-                    timestamp as previous_timestamp,
-                    ROW_NUMBER() OVER (PARTITION BY product_id ORDER BY timestamp ASC) as rn
-                FROM price_history
-                WHERE timestamp >= ?
+                    ph.product_id,
+                    ph.sell_price_eur as previous_price,
+                    ph.timestamp as previous_timestamp,
+                    ROW_NUMBER() OVER (PARTITION BY ph.product_id ORDER BY ph.timestamp ASC) as rn
+                FROM price_history ph
+                WHERE ph.timestamp >= ?
             )
             SELECT
                 p.product_name,
                 p.url,
                 p.product_type,
                 p.total_weight_g,
+                p.purity_per_mille,
                 lp.current_price,
-                lp.current_price_per_g,
+                ROUND(lp.current_price / (p.total_weight_g * p.purity_per_mille / 1000.0), 4) as current_price_per_g,
                 ep.previous_price,
-                ep.previous_price_per_g,
+                ROUND(ep.previous_price / (p.total_weight_g * p.purity_per_mille / 1000.0), 4) as previous_price_per_g,
                 lp.current_timestamp,
                 ep.previous_timestamp,
                 ROUND(((lp.current_price - ep.previous_price) / ep.previous_price) * 100, 2) as change_pct,
-                ROUND(((lp.current_price_per_g - ep.previous_price_per_g) / ep.previous_price_per_g) * 100, 2) as change_per_g_pct
+                ROUND(((lp.current_price / (p.total_weight_g * p.purity_per_mille / 1000.0) - 
+                        ep.previous_price / (p.total_weight_g * p.purity_per_mille / 1000.0)) / 
+                       (ep.previous_price / (p.total_weight_g * p.purity_per_mille / 1000.0))) * 100, 2) as change_per_g_pct
             FROM products p
             JOIN latest_prices lp ON p.id = lp.product_id AND lp.rn = 1
             JOIN earliest_prices ep ON p.id = ep.product_id AND ep.rn = 1

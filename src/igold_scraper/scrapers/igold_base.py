@@ -144,7 +144,7 @@ class IgoldBaseScraper(BaseScraper):
                 # Accept products with sell price, buy price, or both
                 has_sell = sell_price_eur and sell_price_eur > 0
                 has_buy = buy_price_eur and buy_price_eur > 0
-                
+
                 if has_sell or has_buy:
                     prices.append({
                         'url': url,

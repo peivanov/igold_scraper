@@ -99,7 +99,6 @@ def run_scraper(
                 try:
                     product_manager.add_price_entry(
                         url=url,
-                        metal_type=metal_type,
                         sell_price_eur=price_data['sell_price_eur'],
                         buy_price_eur=price_data['buy_price_eur']
                     )
@@ -128,7 +127,11 @@ def print_summary_stats(product_manager: DatabaseManager, metal_type: str) -> No
     # Sort by price per gram (handle None values)
     sorted_products = sorted(
         latest_prices,
-        key=lambda x: x.get('price_per_g_fine_eur') if x.get('price_per_g_fine_eur') is not None else float('inf')
+        key=lambda x: (
+            x.get('price_per_g_fine_eur')
+            if x.get('price_per_g_fine_eur') is not None
+            else float('inf')
+        )
     )
 
     # Print summary statistics
