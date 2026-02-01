@@ -320,6 +320,10 @@ class DailyReportGenerator:
                 WHERE p.metal_type = ?
                 AND ph.timestamp >= ? AND ph.timestamp <= ?
                 AND ph.sell_price_eur > 0
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) >= 
+                    CASE WHEN ? = 'gold' THEN 70 ELSE 1.0 END
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) <= 
+                    CASE WHEN ? = 'gold' THEN 250 ELSE 20.0 END
             ),
             YesterdayPrices AS (
                 SELECT
@@ -331,6 +335,10 @@ class DailyReportGenerator:
                 WHERE p.metal_type = ?
                 AND ph.timestamp >= ? AND ph.timestamp <= ?
                 AND ph.sell_price_eur > 0
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) >= 
+                    CASE WHEN ? = 'gold' THEN 70 ELSE 1.0 END
+                AND (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) <= 
+                    CASE WHEN ? = 'gold' THEN 250 ELSE 20.0 END
             )
             SELECT
                 t.id,
@@ -343,9 +351,11 @@ class DailyReportGenerator:
             JOIN YesterdayPrices y ON t.id = y.id
             WHERE t.rn = 1 AND y.rn = 1
             AND y.yesterday_price > 0
+            AND ABS((t.today_price - y.yesterday_price) / y.yesterday_price * 100) <= 50
             ORDER BY change_pct DESC
         """,
-            (metal_type, today_start, today_end, metal_type, yesterday_start, yesterday_end),
+            (metal_type, today_start, today_end, metal_type, metal_type, 
+             metal_type, yesterday_start, yesterday_end, metal_type, metal_type),
         )
 
         all_movers = [dict(row) for row in cursor.fetchall()]
