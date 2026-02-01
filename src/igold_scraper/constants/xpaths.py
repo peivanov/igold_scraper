@@ -15,11 +15,11 @@ CATEGORY_ITEM_URL = 'string(.//dd[@class="kv__member-name"]/a[1]/@href)'
 CATEGORY_ITEM_NAME = 'string(.//dd[@class="kv__member-name"]//h2)'
 CATEGORY_ITEM_BUY_PRICE_EUR = (
     'normalize-space(.//dt[contains(@class, "kv__member-cat-left")]//'
-    'span[contains(@class, "catE-") or contains(@class, "cat2E-")])'
+    'span[contains(@class, "cat2E-")])'
 )
 CATEGORY_ITEM_SELL_PRICE_EUR = (
     'normalize-space(.//dt[contains(@class, "kv__member-cat-right")]//'
-    'span[contains(@class, "catE-")])'
+    'span[contains(@class, "catE-") and not(contains(@class, "cat2E-"))])'
 )
 
 # Product page - Basic info

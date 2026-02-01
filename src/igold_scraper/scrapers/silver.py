@@ -10,6 +10,7 @@ Refactored to use ProductManager for product-based storage with price history.
 import logging
 import argparse
 import time
+from datetime import datetime, timedelta
 
 from igold_scraper.scrapers.igold_base import IgoldBaseScraper
 from igold_scraper.services.database_manager import DatabaseManager
@@ -102,6 +103,13 @@ def main() -> None:
 
     # Get latest prices for all products
     latest_prices = product_manager.get_latest_prices('silver')
+    
+    # Filter to only products updated today (within last 24 hours)
+    cutoff_timestamp = int((datetime.now() - timedelta(hours=24)).timestamp())
+    latest_prices = [
+        p for p in latest_prices 
+        if p.get('timestamp') and p.get('timestamp') > cutoff_timestamp
+    ]
 
     # Sort by price per gram (handle None values)
     sorted_products = sorted(

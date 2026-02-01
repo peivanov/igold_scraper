@@ -142,11 +142,10 @@ class IgoldBaseScraper(BaseScraper):
                         logger.debug("Failed to parse sell price '%s': %s", sell_price_str, e)
 
                 # Validate and add if we have at least one valid price
-                # Accept products with sell price, buy price, or both
+                # Only track products igold.bg sells (not buy-only products)
                 has_sell = sell_price_eur and sell_price_eur > 0
-                has_buy = buy_price_eur and buy_price_eur > 0
 
-                if has_sell or has_buy:
+                if has_sell:  # Only store if they actually sell this product
                     prices.append({
                         'url': url,
                         'sell_price_eur': sell_price_eur or 0.0,  # Use 0 if not available

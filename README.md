@@ -72,31 +72,24 @@ python scripts/price_tracker.py
 python scripts/statistics_generator.py
 ```
 
-## Output Files
+## Data Storage
 
-### CSV Reports
-- `igold_gold_products_sorted.csv` - Gold products sorted by price per gram
-- `igold_silver_products_sorted.csv` - Silver products sorted by price per gram
-- `igold_tavex_gold_products_sorted.csv` - With Tavex comparison (if `--compare-tavex` used)
+All product data and price history is stored in a SQLite database (`data/products.db`):
+- **products** table: Product metadata (name, weight, purity, etc.)
+- **price_history** table: Historical buy/sell prices with timestamps
 
-### Historical Data (GitHub Actions)
+### Additional Files
 ```
 data/
-├── gold/                         # Daily gold scraping results
-│   └── 2025-10-25.json
-├── silver/                       # Daily silver scraping results
-│   └── 2025-10-25.json
-├── live_prices/
-│   ├── gold/                     # Live XAU/EUR spot prices
-│   │   └── 2025-10-25.json
-│   └── silver/                   # Live XAG/EUR spot prices
-│       └── 2025-10-25.json
-└── statistics/                   # Weekly/monthly market reports
-    ├── gold_weekly_2025-10-25.json
-    └── silver_weekly_2025-10-25.json
+├── products.db                   # Main SQLite database
+└── live_prices/
+    ├── gold/                     # Live XAU/EUR spot prices
+    │   └── 2025-10-25.json
+    └── silver/                   # Live XAG/EUR spot prices
+        └── 2025-10-25.json
 ```
 
-**Data Retention**: 6 months of historical data with automatic cleanup
+**Data Retention**: All historical price data is retained in the database
 
 ## Key Metrics
 

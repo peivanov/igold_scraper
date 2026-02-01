@@ -173,20 +173,37 @@ class DatabaseManager:
             if timestamp is None:
                 timestamp = int(datetime.now().timestamp())
 
-            # Insert price entry (UNIQUE constraint prevents duplicates)
-            try:
-                self.conn.execute("""
-                    INSERT INTO price_history (
-                        product_id, timestamp, sell_price_eur, buy_price_eur
-                    ) VALUES (?, ?, ?, ?)
-                """, (product_id, timestamp, sell_price_eur, buy_price_eur))
-            except sqlite3.IntegrityError:
-                # Duplicate entry - update instead
-                self.conn.execute("""
-                    UPDATE price_history
-                    SET sell_price_eur = ?, buy_price_eur = ?
-                    WHERE product_id = ? AND timestamp = ?
-                """, (sell_price_eur, buy_price_eur, product_id, timestamp))
+            # Check if we already have an entry for today
+            today_start = int(datetime.now().replace(hour=0, minute=0, second=0, microsecond=0).timestamp())
+            today_end = int(datetime.now().replace(hour=23, minute=59, second=59, microsecond=999999).timestamp())
+            
+            cursor = self.conn.execute("""
+                SELECT id
+                FROM price_history
+                WHERE product_id = ? AND timestamp >= ? AND timestamp <= ?
+                LIMIT 1
+            """, (product_id, today_start, today_end))
+            
+            existing_today = cursor.fetchone()
+            
+            # Only insert if we don't have an entry for today yet
+            if existing_today is None:
+                # Insert price entry (UNIQUE constraint prevents duplicates)
+                try:
+                    self.conn.execute("""
+                        INSERT INTO price_history (
+                            product_id, timestamp, sell_price_eur, buy_price_eur
+                        ) VALUES (?, ?, ?, ?)
+                    """, (product_id, timestamp, sell_price_eur, buy_price_eur))
+                except sqlite3.IntegrityError:
+                    # Duplicate timestamp - update instead
+                    self.conn.execute("""
+                        UPDATE price_history
+                        SET sell_price_eur = ?, buy_price_eur = ?
+                        WHERE product_id = ? AND timestamp = ?
+                    """, (sell_price_eur, buy_price_eur, product_id, timestamp))
+            else:
+                logger.debug("Skipping price entry for %s - already have entry for today", url)
 
             self.conn.commit()
             return True
@@ -242,6 +259,7 @@ class DatabaseManager:
                 (p.total_weight_g * p.purity_per_mille / 1000.0) as fine_metal_g,
                 ph.sell_price_eur,
                 ph.buy_price_eur,
+                ph.timestamp,
                 CASE 
                     WHEN ph.sell_price_eur > 0 THEN (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0))
                     ELSE NULL
