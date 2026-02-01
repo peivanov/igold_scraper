@@ -644,7 +644,7 @@ class DailyReportGenerator:
             # Add hyperlink to product name if URL available
             full_url = f"https://igold.bg{url}" if url and url.startswith('/') else url
             name_display = f"[{name}]({full_url})" if full_url else f"**{name}**"
-            deal_line = f"{type_emoji} **{i}.** {name_display}\n   💰 {price_per_g:.2f} €/g | Total: {sell_price:.0f} €{spread_text}"
+            deal_line = f"{type_emoji} **{i}.** {name_display}\n   {price_per_g:.2f} €/g | Total: {sell_price:.0f} €{spread_text}"
             best_deals_text += deal_line + "\n"
 
         # Build affordable deals
@@ -670,7 +670,7 @@ class DailyReportGenerator:
                 # Add hyperlink to product name if URL available
                 full_url = f"https://igold.bg{url}" if url and url.startswith('/') else url
                 name_display = f"[{name}]({full_url})" if full_url else f"**{name}**"
-                deal_line = f"{type_emoji} **{i}.** {name_display}\n   💰 {price_per_g:.2f} €/g | {sell_price:.0f} €{spread_text}"
+                deal_line = f"{type_emoji} **{i}.** {name_display}\n   {price_per_g:.2f} €/g | {sell_price:.0f} €{spread_text}"
                 affordable_text += deal_line + "\n"
 
         # Build price movers (biggest decreases - good for buyers!)
@@ -678,10 +678,15 @@ class DailyReportGenerator:
         if stats.get("price_decreases"):
             for i, mover in enumerate(stats["price_decreases"][:5], 1):
                 name = mover["product_name"][:45]
+                url = mover.get("url", "")
                 change = mover["change_pct"]
                 today_price = mover["today_price"]
 
-                drop_line = f"**{i}. {name}**\n   💸 {change:.1f}% drop → {today_price:.2f} €/g"
+                # Add hyperlink to product name if URL available
+                full_url = f"https://igold.bg{url}" if url and url.startswith('/') else url
+                name_display = f"[{name}]({full_url})" if full_url else f"**{name}**"
+                
+                drop_line = f"**{i}.** {name_display} 💸 {change:.1f}% → {today_price:.2f} €/g"
                 price_drops_text += drop_line + "\n"
 
         # Build embed fields
