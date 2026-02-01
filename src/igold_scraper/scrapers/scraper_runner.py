@@ -56,7 +56,6 @@ def run_scraper(
             # Extract prices from category page
             try:
                 category_prices = scraper.extract_category_prices(full_url)
-                logger.info("Extracted %d prices from category page", len(category_prices))
             except Exception as e:
                 logger.exception("Failed to extract prices from %s: %s", full_url, e)
                 continue
