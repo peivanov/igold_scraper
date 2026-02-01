@@ -449,8 +449,8 @@ class DailyReportGenerator:
             "products": products,
         }
 
-    def load_live_price(self, metal_type: str, date: datetime) -> Optional[float]:
-        """Load live price for a specific date"""
+    def load_live_price(self, metal_type: str, date: datetime) -> Optional[Dict]:
+        """Load live price data for a specific date"""
         date_str = date.strftime("%Y-%m-%d")
         file_path = self.data_dir / "live_prices" / metal_type / f"{date_str}.json"
 
@@ -464,7 +464,14 @@ class DailyReportGenerator:
                 if isinstance(data, list) and len(data) > 0:
                     data = data[0]  # Take first entry if it's an array
                 if isinstance(data, dict):
-                    return data.get("price_eur_per_g")
+                    prices = data.get("prices", {})
+                    # Return full data object with bid/ask/spread
+                    return {
+                        "price_eur_per_g": data.get("price_eur_per_g") or prices.get("eur_per_gram", {}).get("mid"),
+                        "source": data.get("source"),
+                        "platform": data.get("platform"),
+                        "prices": prices
+                    }
                 return None
         except (OSError, json.JSONDecodeError) as e:
             logger.exception("Error loading live price from %s: %s", file_path, e)
@@ -474,8 +481,8 @@ class DailyReportGenerator:
         self,
         today: datetime,
         yesterday: datetime,
-        today_live_price: Optional[float],
-        yesterday_live_price: Optional[float],
+        today_live_price: Optional[Dict],
+        yesterday_live_price: Optional[Dict],
         metal_type: str = "gold",
     ) -> Dict:
         """
@@ -484,8 +491,8 @@ class DailyReportGenerator:
         Args:
             today: Today's date
             yesterday: Yesterday's date
-            today_live_price: Live metal price today (per gram)
-            yesterday_live_price: Live metal price yesterday (per gram)
+            today_live_price: Live metal price data today (dict with prices, bid/ask, etc.)
+            yesterday_live_price: Live metal price data yesterday (dict with prices, bid/ask, etc.)
             metal_type: 'gold' or 'silver'
 
         Returns:
@@ -555,8 +562,11 @@ class DailyReportGenerator:
 
         # Live price comparison
         live_price_change_pct = 0
-        if today_live_price and yesterday_live_price:
-            live_price_change_pct = (today_live_price - yesterday_live_price) / yesterday_live_price * 100
+        today_live_price_value = today_live_price.get("price_eur_per_g") if today_live_price else None
+        yesterday_live_price_value = yesterday_live_price.get("price_eur_per_g") if yesterday_live_price else None
+        
+        if today_live_price_value and yesterday_live_price_value:
+            live_price_change_pct = (today_live_price_value - yesterday_live_price_value) / yesterday_live_price_value * 100
 
         # Get affordable deals
         price_limit = 2500 if metal_type == "gold" else 1000
@@ -587,11 +597,11 @@ class DailyReportGenerator:
             # Price movers
             "price_increases": price_increases,
             "price_decreases": price_decreases,
-            # Live prices
+            # Live prices (full data with bid/ask/spread)
             "live_price_today": today_live_price,
             "live_price_yesterday": yesterday_live_price,
             "live_price_change_pct": (
-                round(live_price_change_pct, 2) if today_live_price and yesterday_live_price else None
+                round(live_price_change_pct, 2) if today_live_price_value and yesterday_live_price_value else None
             ),
         }
 
@@ -696,17 +706,43 @@ class DailyReportGenerator:
             },
         ]
 
-        # Add live price if available
+        # Add detailed live market price if available
         if stats.get("live_price_today"):
-            live_change = stats.get("live_price_change_pct", 0)
-            live_emoji = "📈" if live_change > 0 else "📉" if live_change < 0 else "➡️"
-            fields.append(
-                {
-                    "name": "🌍 Live Spot Price",
-                    "value": (f"{stats['live_price_today']:.2f} €/g\n" f"Change: {live_emoji} {live_change:+.2f}%"),
-                    "inline": True,
-                }
+            live_data = stats["live_price_today"]
+            
+            # Extract price data
+            prices = live_data.get("prices", {})
+            eur_per_gram = prices.get("eur_per_gram", {})
+            eur_per_oz = prices.get("eur_per_oz", {})
+            
+            # Get mid, bid, ask in EUR
+            mid_eur = eur_per_gram.get("mid", 0)
+            bid_eur = eur_per_gram.get("bid", 0)
+            ask_eur = eur_per_gram.get("ask", 0)
+            spread_eur_oz = eur_per_oz.get("spread", 0)
+            
+            source = live_data.get("source", "Live Market Data")
+            platform = live_data.get("platform", "MarketData")
+            
+            metal_emoji = "💰" if metal_type == "gold" else "🪙"
+            live_price_text = (
+                f"**Current Price**\n"
+                f"{mid_eur:.2f} EUR/g\n\n"
+                f"**Bid / Ask**\n"
+                f"{bid_eur:.2f} / {ask_eur:.2f} EUR/g\n\n"
+                f"**Source**\n"
+                f"{source}\n"
+                f"Platform: {platform}"
             )
+            
+            if spread_eur_oz > 0:
+                live_price_text += f" | Spread: {spread_eur_oz:.1f} EUR/oz"
+            
+            fields.insert(0, {
+                "name": f"{metal_emoji} Live {metal_name} Market Price",
+                "value": live_price_text,
+                "inline": False,
+            })
 
         # Add new products if any
         if stats["new_products_count"] > 0:
