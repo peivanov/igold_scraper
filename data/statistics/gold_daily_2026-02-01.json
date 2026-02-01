@@ -5,97 +5,139 @@
   "statistics": {
     "today_date": "2026-02-01",
     "yesterday_date": "2026-01-31",
-    "market_avg_price": 144.61,
-    "market_min_price": 3.18,
-    "market_max_price": 245.44,
-    "yesterday_avg_price": 145.77,
-    "week_ago_avg_price": 168.29,
-    "price_change_pct": -0.8,
-    "week_price_change_pct": -14.07,
-    "trend": "stable",
-    "total_products_today": 195,
-    "total_products_yesterday": 194,
-    "new_products_count": 4,
+    "market_avg_price": 207.0,
+    "market_min_price": 2.37,
+    "market_max_price": 2412.52,
+    "yesterday_avg_price": 291.89,
+    "week_ago_avg_price": 358.57,
+    "price_change_pct": -29.08,
+    "week_price_change_pct": -42.27,
+    "trend": "decreasing",
+    "total_products_today": 260,
+    "total_products_yesterday": 160,
+    "new_products_count": 10,
     "new_products": [
       {
-        "id": 215,
-        "product_name": "31.1 гр. (1 toz.) Сребърно Кюлче Тор Royal Mint",
-        "url": "/srebarno-kyulche-1-oz-tor-royal-mint",
-        "price_per_g_fine_eur": 4.735200208123707,
-        "sell_price_eur": 147.25
+        "id": 2,
+        "product_name": "100 гр. Златно Кюлче Argor-Heraeus Швейцария Холограмна Защита",
+        "url": "/zlatno-kyulche-100-g-argor-heraeus-kinebar",
+        "price_per_g_fine_eur": 0.0,
+        "sell_price_eur": 0.0
       },
       {
-        "id": 216,
-        "product_name": "31.1 гр. ( 1 toz. ) Сребърно Кюлче Один Royal Mint",
-        "url": "/srebarno-kyulche-31-1-g-odin",
-        "price_per_g_fine_eur": 4.735200208123707,
-        "sell_price_eur": 147.25
+        "id": 4,
+        "product_name": "50 гр. Златно Кюлче Argor- Heraeus Швейцария Холограмна Защита",
+        "url": "/zlatno-kyulche-50-g-argor-heraeus-kinebar",
+        "price_per_g_fine_eur": 0.0,
+        "sell_price_eur": 0.0
       },
       {
-        "id": 608,
-        "product_name": "31.1 гр. ( 1 toz. ) Златна Монета Китайска Панда 2015",
-        "url": "/zlatna-moneta-1-oz-panda-2015",
-        "price_per_g_fine_eur": 143.47190346044252,
-        "sell_price_eur": 4461.53
+        "id": 20,
+        "product_name": "6.45 гр. Златна Монета 20 Италиански Лири Умберто I 1879- 1897",
+        "url": "/20-zlatni-liri-umberto-i",
+        "price_per_g_fine_eur": 0.0,
+        "sell_price_eur": 0.0
       },
       {
-        "id": 607,
-        "product_name": "5 гр. Златно Кюлче Argor- Heraeus Швейцария Лунар Дракон 2024",
-        "url": "/zlatno-kyulche-5-g-drakon-2024",
-        "price_per_g_fine_eur": 179.37993799379936,
-        "sell_price_eur": 896.81
+        "id": 21,
+        "product_name": "6.45 гр. Златна Монета 20 Италиански Лири Емануеле II 1861- 1878",
+        "url": "/20-zlatni-liri-emanuele-ii",
+        "price_per_g_fine_eur": 0.0,
+        "sell_price_eur": 0.0
+      },
+      {
+        "id": 27,
+        "product_name": "6.45 гр. Златна Монета 8 Флорина/20 Франка Франц Йосиф I Австрия 1892",
+        "url": "/8-zlatni-florina-franz-yosif",
+        "price_per_g_fine_eur": 0.0,
+        "sell_price_eur": 0.0
+      },
+      {
+        "id": 70,
+        "product_name": "5 гр. Златно Кюлче Argor-Heraeus Швейцария Холограмна Защита",
+        "url": "/zlatno-kyulche-5-gr-argor-heraeus-kinebar",
+        "price_per_g_fine_eur": 0.0,
+        "sell_price_eur": 0.0
+      },
+      {
+        "id": 79,
+        "product_name": "3.22 гр. Златна Монета 4 Флорина/10 Франка Франц Йосиф I Австрия 1892",
+        "url": "/4-zlatni-florina-10-franka-franz-yosif-i-1892",
+        "price_per_g_fine_eur": 0.0,
+        "sell_price_eur": 0.0
+      },
+      {
+        "id": 108,
+        "product_name": "1 гр. Златно Кюлче Pamp Fortuna Швейцария",
+        "url": "/zlatno-kyulche-pamp-fortuna-1-g",
+        "price_per_g_fine_eur": 0.0,
+        "sell_price_eur": 0.0
+      },
+      {
+        "id": 114,
+        "product_name": "3.22 гр. Златна Монета 10 Френски Франка Наполеон III с венец 1861-1868",
+        "url": "/10-zlatni-franka-napoleon-iii-s-venetz-1861-1868",
+        "price_per_g_fine_eur": 0.0,
+        "sell_price_eur": 0.0
+      },
+      {
+        "id": 323,
+        "product_name": "6.78 гр. Златна Монета 20 Корони Франц-Йосиф I Австрия 1915",
+        "url": "/zlatna-moneta-20-koroni-avstria",
+        "price_per_g_fine_eur": 0.0,
+        "sell_price_eur": 0.0
       }
     ],
     "best_deals": [
       {
-        "id": 219,
-        "product_name": "1 кг Сребърна Монета Австралийска Коала",
+        "id": 216,
+        "product_name": "62.2 гр. ( 2 toz. ) Златна Монета Австралийски Лунар Змия 2025",
         "product_type": "coin",
-        "total_weight_g": 1000.0,
-        "url": "/srebarna-moneta-1-kg-koala",
-        "sell_price_eur": 3175.12,
-        "buy_price_eur": 2888.29,
-        "price_per_g_fine_eur": 3.1782982982982984
+        "total_weight_g": 62.2,
+        "url": "/zlatna-moneta-2-oz-lunar-zmiya-2025",
+        "sell_price_eur": 147.25,
+        "buy_price_eur": 93.57,
+        "price_per_g_fine_eur": 2.3676001040618533
       },
       {
-        "id": 220,
-        "product_name": "1 кг Сребърна Монета Австралийска Кукабура",
+        "id": 218,
+        "product_name": "34.05 гр. ( 1 toz. ) Златна Монета Британия 1987- 2012",
         "product_type": "coin",
-        "total_weight_g": 1000.0,
-        "url": "/srebarna-moneta-1-kg-kukabura",
-        "sell_price_eur": 3175.12,
-        "buy_price_eur": 2888.29,
-        "price_per_g_fine_eur": 3.1782982982982984
+        "total_weight_g": 34.05,
+        "url": "/zlatna-moneta-1-oz-britania-1987-2012",
+        "sell_price_eur": 102.77,
+        "buy_price_eur": 64.93,
+        "price_per_g_fine_eur": 3.291394238698943
       },
       {
-        "id": 179,
-        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Кругерранд",
+        "id": 214,
+        "product_name": "31.1 гр. ( 1 toz. ) Златна Монета Надуваемата Лодка Джеймс Бонд 007 от 2000-те 2025",
         "product_type": "coin",
         "total_weight_g": 31.1,
-        "url": "/srebarna-moneta-1-oz-krugerrand",
-        "sell_price_eur": 101.05,
-        "buy_price_eur": 91.98,
-        "price_per_g_fine_eur": 3.2524485900691684
+        "url": "/zlatna-moneta-1-oz-bond-00-te-2025",
+        "sell_price_eur": 103.79,
+        "buy_price_eur": 50.11,
+        "price_per_g_fine_eur": 3.3376327986496404
       },
       {
-        "id": 181,
-        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Кенгуру",
+        "id": 28,
+        "product_name": "31.1 гр. ( 1 toz. ) Златна Монета Австралийски Лунар Змия 2025",
         "product_type": "coin",
         "total_weight_g": 31.1,
-        "url": "/srebarna-moneta-1-oz-kenguru",
-        "sell_price_eur": 101.05,
-        "buy_price_eur": 91.98,
-        "price_per_g_fine_eur": 3.2524485900691684
+        "url": "/zlatna-moneta-1-oz-lunar-zmiya-2025",
+        "sell_price_eur": 144.7,
+        "buy_price_eur": 143.67,
+        "price_per_g_fine_eur": 4.653198438814942
       },
       {
-        "id": 186,
-        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Мексикански Либертад",
+        "id": 304,
+        "product_name": "155.5 гр. ( 5 toz. ) Златна Монета Сомалийски Слон 2023",
         "product_type": "coin",
-        "total_weight_g": 31.1,
-        "url": "/srebarna-moneta-1-oz-meksikanski-libertad",
-        "sell_price_eur": 104.3,
-        "buy_price_eur": 95.1,
-        "price_per_g_fine_eur": 3.3570548040001413
+        "total_weight_g": 155.5,
+        "url": "/zlatna-moneta-5-oz-somaliyski-slon-2023",
+        "sell_price_eur": 729.1,
+        "buy_price_eur": 558.84,
+        "price_per_g_fine_eur": 4.689214902197616
       }
     ],
     "product_types_top5": {
@@ -104,129 +146,180 @@
     },
     "affordable_deals": [
       {
-        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Кругерранд",
-        "product_type": "coin",
-        "total_weight_g": 31.1,
-        "sell_price_eur": 101.05,
-        "buy_price_eur": 91.98,
-        "price_per_g_fine_eur": 3.2524485900691684
-      },
-      {
-        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Кенгуру",
-        "product_type": "coin",
-        "total_weight_g": 31.1,
-        "sell_price_eur": 101.05,
-        "buy_price_eur": 91.98,
-        "price_per_g_fine_eur": 3.2524485900691684
-      },
-      {
-        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Мексикански Либертад",
-        "product_type": "coin",
-        "total_weight_g": 31.1,
-        "sell_price_eur": 104.3,
-        "buy_price_eur": 95.1,
-        "price_per_g_fine_eur": 3.3570548040001413
-      },
-      {
-        "product_name": "311 гр. ( 10 toz. ) Сребърна Монета Австралийскa Кукабура 2025",
-        "product_type": "coin",
-        "total_weight_g": 311.0,
-        "sell_price_eur": 1254.2,
-        "buy_price_eur": 826.25,
-        "price_per_g_fine_eur": 4.036834261914648
-      },
-      {
-        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Австралийска Коала 2025 RAM",
-        "product_type": "coin",
-        "total_weight_g": 31.1,
-        "sell_price_eur": 127.82,
-        "buy_price_eur": 80.27,
-        "price_per_g_fine_eur": 4.110378883547519
-      },
-      {
-        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Австралийски Лунар Кон 2026",
-        "product_type": "coin",
-        "total_weight_g": 31.1,
-        "sell_price_eur": 133.96,
-        "buy_price_eur": 89.99,
-        "price_per_g_fine_eur": 4.311707205597881
-      },
-      {
-        "product_name": "62.2 гр. ( 2 toz. ) Сребърна 3D Монета Thor Kra Koom Marvel 2025",
+        "product_name": "62.2 гр. ( 2 toz. ) Златна Монета Австралийски Лунар Змия 2025",
         "product_type": "coin",
         "total_weight_g": 62.2,
-        "sell_price_eur": 276.61,
-        "buy_price_eur": 230.08,
-        "price_per_g_fine_eur": 4.45155766699175
-      },
-      {
-        "product_name": "62.2 гр. ( 2 toz. ) Сребърна Монета Бик и Мечка Канада 2025",
-        "product_type": "coin",
-        "total_weight_g": 62.2,
-        "sell_price_eur": 293.99,
-        "buy_price_eur": 157.99,
-        "price_per_g_fine_eur": 4.73125858977949
-      },
-      {
-        "product_name": "31.1 гр. (1 toz.) Сребърно Кюлче Тор Royal Mint",
-        "product_type": "bar",
-        "total_weight_g": 31.1,
-        "sell_price_eur": 147.25,
-        "buy_price_eur": 82.83,
-        "price_per_g_fine_eur": 4.735200208123707
-      },
-      {
-        "product_name": "31.1 гр. ( 1 toz. ) Сребърно Кюлче Один Royal Mint",
-        "product_type": "bar",
-        "total_weight_g": 31.1,
+        "url": "/zlatna-moneta-2-oz-lunar-zmiya-2025",
         "sell_price_eur": 147.25,
         "buy_price_eur": 93.57,
-        "price_per_g_fine_eur": 4.735200208123707
+        "price_per_g_fine_eur": 2.3676001040618533
+      },
+      {
+        "product_name": "34.05 гр. ( 1 toz. ) Златна Монета Британия 1987- 2012",
+        "product_type": "coin",
+        "total_weight_g": 34.05,
+        "url": "/zlatna-moneta-1-oz-britania-1987-2012",
+        "sell_price_eur": 102.77,
+        "buy_price_eur": 64.93,
+        "price_per_g_fine_eur": 3.291394238698943
+      },
+      {
+        "product_name": "31.1 гр. ( 1 toz. ) Златна Монета Надуваемата Лодка Джеймс Бонд 007 от 2000-те 2025",
+        "product_type": "coin",
+        "total_weight_g": 31.1,
+        "url": "/zlatna-moneta-1-oz-bond-00-te-2025",
+        "sell_price_eur": 103.79,
+        "buy_price_eur": 50.11,
+        "price_per_g_fine_eur": 3.3376327986496404
+      },
+      {
+        "product_name": "31.1 гр. ( 1 toz. ) Златна Монета Австралийски Лунар Змия 2025",
+        "product_type": "coin",
+        "total_weight_g": 31.1,
+        "url": "/zlatna-moneta-1-oz-lunar-zmiya-2025",
+        "sell_price_eur": 144.7,
+        "buy_price_eur": 143.67,
+        "price_per_g_fine_eur": 4.653198438814942
+      },
+      {
+        "product_name": "155.5 гр. ( 5 toz. ) Златна Монета Сомалийски Слон 2023",
+        "product_type": "coin",
+        "total_weight_g": 155.5,
+        "url": "/zlatna-moneta-5-oz-somaliyski-slon-2023",
+        "sell_price_eur": 729.1,
+        "buy_price_eur": 558.84,
+        "price_per_g_fine_eur": 4.689214902197616
+      },
+      {
+        "product_name": "31.1 гр. ( 1 toz. ) Златна Монета Кралски Зверове Белият Лъв от Мортимър 2020",
+        "product_type": "coin",
+        "total_weight_g": 31.1,
+        "url": "/zlatna-moneta-1-oz-beliyat-luv-ot-mortimar-2020",
+        "sell_price_eur": 190.2,
+        "buy_price_eur": 166.17,
+        "price_per_g_fine_eur": 6.11636726373602
+      },
+      {
+        "product_name": "23.33 гр. Златна Монета 2 Лева Паисий Хилендарски 2022",
+        "product_type": "coin",
+        "total_weight_g": 23.33,
+        "url": "/zlatna-moneta-2-lv-paisiy-hilendarski-2022",
+        "sell_price_eur": 147.25,
+        "buy_price_eur": 82.83,
+        "price_per_g_fine_eur": 6.312247169852005
+      },
+      {
+        "product_name": "39.94 гр. Златна Монета Петорен Британски Суверен 1980-1984",
+        "product_type": "coin",
+        "total_weight_g": 39.94,
+        "url": "/zlatna-moneta-petoren-suveren-1980-1984",
+        "sell_price_eur": 239.28,
+        "buy_price_eur": 186.11,
+        "price_per_g_fine_eur": 6.535383963913581
+      },
+      {
+        "product_name": "31.1 гр. ( 1 toz. ) Златна Монета Канадски Кленов Лист",
+        "product_type": "coin",
+        "total_weight_g": 31.1,
+        "url": "/zlaten-kanadski-klenov-list-1-oz",
+        "sell_price_eur": 276.61,
+        "buy_price_eur": 230.08,
+        "price_per_g_fine_eur": 8.8951017288224
+      },
+      {
+        "product_name": "31.1 гр. ( 1 toz. ) Златна Монета Австралийски Лунар Заек 2011",
+        "product_type": "coin",
+        "total_weight_g": 31.1,
+        "url": "/zlatna-moneta-1-oz-lunar-zaek-2011",
+        "sell_price_eur": 476.01,
+        "buy_price_eur": 450.45,
+        "price_per_g_fine_eur": 15.307318513201803
       }
     ],
     "price_increases": [
       {
-        "id": 222,
-        "product_name": "1 кг Сребърно Кюлче Valcambi Швейцария",
-        "url": "/srebarno-kyulche-1-kg-valcambi",
-        "today_price": 3.3946273136568283,
-        "yesterday_price": 3.296928464232116,
-        "change_pct": 2.9633293680658346
+        "id": 347,
+        "product_name": "31.1 гр. ( 1 toz. ) Златна Монета Кралски Зверове Белият Лъв от Мортимър 2020",
+        "url": "/zlatna-moneta-1-oz-beliyat-luv-ot-mortimar-2020",
+        "today_price": 152.76157840864474,
+        "yesterday_price": 6.099966909874268,
+        "change_pct": 2404.301755495809
       },
       {
-        "id": 179,
-        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Кругерранд",
-        "url": "/srebarna-moneta-1-oz-krugerrand",
-        "today_price": 3.2524485900691684,
-        "yesterday_price": 3.1594295259890113,
-        "change_pct": 2.9441727791360988
+        "id": 250,
+        "product_name": "31.1 гр. ( 1 toz. ) Златна Монета Канадски Кленов Лист",
+        "url": "/zlaten-kanadski-klenov-list-1-oz",
+        "today_price": 138.8846280126405,
+        "yesterday_price": 8.8951017288224,
+        "change_pct": 1461.360760637721
       },
       {
-        "id": 181,
-        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Кенгуру",
-        "url": "/srebarna-moneta-1-oz-kenguru",
-        "today_price": 3.2524485900691684,
-        "yesterday_price": 3.1594295259890113,
-        "change_pct": 2.9441727791360988
+        "id": 256,
+        "product_name": "15.55 гр. ( 1/2 toz. ) Златна Монета Виенска Филхармония Австрия",
+        "url": "/zlatna-filharmonia-15-55-g",
+        "today_price": 144.7218676851608,
+        "yesterday_price": 12.7916328610353,
+        "change_pct": 1031.3791543064003
       },
       {
-        "id": 219,
-        "product_name": "1 кг Сребърна Монета Австралийска Коала",
-        "url": "/srebarna-moneta-1-kg-koala",
-        "today_price": 3.1782982982982984,
-        "yesterday_price": 3.1317317317317315,
-        "change_pct": 1.4869270600268591
+        "id": 346,
+        "product_name": "31.1 гр. ( 1 toz. ) Златна Монета Кралски Зверове Соколът на Плантагенетите 2019",
+        "url": "/1-oz-sokol-na-plantagenetite-2019",
+        "today_price": 156.75715481515996,
+        "yesterday_price": 15.833416139041558,
+        "change_pct": 890.0400105611633
       },
       {
-        "id": 220,
-        "product_name": "1 кг Сребърна Монета Австралийска Кукабура",
-        "url": "/srebarna-moneta-1-kg-kukabura",
-        "today_price": 3.1782982982982984,
-        "yesterday_price": 3.1317317317317315,
-        "change_pct": 1.4869270600268591
+        "id": 249,
+        "product_name": "31.1 гр. ( 1 toz. ) Златна Монета Австралийско Кенгуру",
+        "url": "/zlatno-kenguru-1-oz",
+        "today_price": 138.8846280126405,
+        "yesterday_price": 15.603489609411104,
+        "change_pct": 790.0869708585794
       }
     ],
-    "price_decreases": [],
+    "price_decreases": [
+      {
+        "id": 258,
+        "product_name": "16.96 гр. ( 1/2 toz. ) Златна Монета Американски Орел нов дизайн",
+        "url": "/1-2-oz-moneta-zlaten-orel",
+        "today_price": 147.06797968924627,
+        "yesterday_price": 2920.703183692119,
+        "change_pct": -94.96463795053167
+      },
+      {
+        "id": 158,
+        "product_name": "0.5 гр. Златно Кюлче Pamp Фъстъчетата 75 годишнина",
+        "url": "/zlatno-kyulche-pamp-0-5-g-fastachetata",
+        "today_price": 245.44454445444543,
+        "yesterday_price": 2720.3520352035202,
+        "change_pct": -90.97747125084557
+      },
+      {
+        "id": 315,
+        "product_name": "3 гр. Златна Монета Китайска Панда 2026",
+        "url": "/zlatna-moneta-3-g-panda-2026",
+        "today_price": 164.31309797646432,
+        "yesterday_price": 1474.5441210787744,
+        "change_pct": -88.85668488127347
+      },
+      {
+        "id": 36,
+        "product_name": "3.49 гр. Златна Монета 1 Австрийски Дукат 1915",
+        "url": "/zlaten-avstriyski-dukat-3-49-g",
+        "today_price": 147.98874791493515,
+        "yesterday_price": 1295.6374922264133,
+        "change_pct": -88.57792022823973
+      },
+      {
+        "id": 378,
+        "product_name": "3.99 гр. Златна Монета 1/2 Британски Суверен Виктория с корона и щит 1887-1893",
+        "url": "/1-2-suveren-viktoria-korona-i-shtit-1887-93",
+        "today_price": 212.61564514537133,
+        "yesterday_price": 1297.9295626433818,
+        "change_pct": -83.61886104879565
+      }
+    ],
     "live_price_today": null,
     "live_price_yesterday": null,
     "live_price_change_pct": null

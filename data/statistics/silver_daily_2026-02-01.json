@@ -5,21 +5,174 @@
   "statistics": {
     "today_date": "2026-02-01",
     "yesterday_date": "2026-01-31",
-    "market_avg_price": 126.93,
-    "market_min_price": 3.3,
-    "market_max_price": 3032.76,
-    "yesterday_avg_price": 312.31,
-    "week_ago_avg_price": 0,
-    "price_change_pct": -59.36,
-    "week_price_change_pct": 0,
+    "market_avg_price": 17.11,
+    "market_min_price": 1.54,
+    "market_max_price": 321.76,
+    "yesterday_avg_price": 40.2,
+    "week_ago_avg_price": 47.97,
+    "price_change_pct": -57.44,
+    "week_price_change_pct": -64.33,
     "trend": "decreasing",
-    "total_products_today": 25,
-    "total_products_yesterday": 41,
-    "new_products_count": 0,
-    "new_products": [],
+    "total_products_today": 65,
+    "total_products_yesterday": 34,
+    "new_products_count": 10,
+    "new_products": [
+      {
+        "id": 395,
+        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Филхармония",
+        "url": "/srebarna-moneta-1-oz-filharmoniya",
+        "price_per_g_fine_eur": 0.0,
+        "sell_price_eur": 0.0
+      },
+      {
+        "id": 396,
+        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Кленов Лист",
+        "url": "/srebarna-moneta-1-oz-klenov-list",
+        "price_per_g_fine_eur": 0.0,
+        "sell_price_eur": 0.0
+      },
+      {
+        "id": 400,
+        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Американски Орел",
+        "url": "/srebarna-moneta-1-oz-amerikanski-orel",
+        "price_per_g_fine_eur": 0.0,
+        "sell_price_eur": 0.0
+      },
+      {
+        "id": 465,
+        "product_name": "30 гр. Сребърна Монета Китайска Панда",
+        "url": "/srebarna-moneta-30-g-panda",
+        "price_per_g_fine_eur": 0.0,
+        "sell_price_eur": 0.0
+      },
+      {
+        "id": 517,
+        "product_name": "15 кг Сребърно Кюлче Heraeus Германия",
+        "url": "/srebarno-kyulche-15-kg-heraeus",
+        "price_per_g_fine_eur": 3.0327617141904284,
+        "sell_price_eur": 45468.68
+      },
+      {
+        "id": 434,
+        "product_name": "1 кг Сребърна Монета Австралийска Коала",
+        "url": "/srebarna-moneta-1-kg-koala",
+        "price_per_g_fine_eur": 3.1782982982982984,
+        "sell_price_eur": 3175.12
+      },
+      {
+        "id": 435,
+        "product_name": "1 кг Сребърна Монета Австралийска Кукабура",
+        "url": "/srebarna-moneta-1-kg-kukabura",
+        "price_per_g_fine_eur": 3.1782982982982984,
+        "sell_price_eur": 3175.12
+      },
+      {
+        "id": 398,
+        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Кенгуру",
+        "url": "/srebarna-moneta-1-oz-kenguru",
+        "price_per_g_fine_eur": 3.2524485900691684,
+        "sell_price_eur": 101.05
+      },
+      {
+        "id": 399,
+        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Кругерранд",
+        "url": "/srebarna-moneta-1-oz-krugerrand",
+        "price_per_g_fine_eur": 3.2524485900691684,
+        "sell_price_eur": 101.05
+      },
+      {
+        "id": 491,
+        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Британия",
+        "url": "/1-oz-srebarna-moneta-britania",
+        "price_per_g_fine_eur": 3.303303303303303,
+        "sell_price_eur": 102.63
+      }
+    ],
     "best_deals": [
       {
-        "id": 543,
+        "id": 410,
+        "product_name": "155.5 гр. ( 5 toz. ) Сребърна Монета Австралийски Лунар Петел 2017",
+        "product_type": "coin",
+        "total_weight_g": 155.5,
+        "url": "/srebarna-moneta-5-oz-lunar-petel-2017",
+        "sell_price_eur": 239.28,
+        "buy_price_eur": 186.11,
+        "price_per_g_fine_eur": 1.5403184535017331
+      },
+      {
+        "id": 517,
+        "product_name": "15 кг Сребърно Кюлче Heraeus Германия",
+        "product_type": "bar",
+        "total_weight_g": 15000.0,
+        "url": "/srebarno-kyulche-15-kg-heraeus",
+        "sell_price_eur": 45468.68,
+        "buy_price_eur": 34660.48,
+        "price_per_g_fine_eur": 3.0327617141904284
+      },
+      {
+        "id": 434,
+        "product_name": "1 кг Сребърна Монета Австралийска Коала",
+        "product_type": "coin",
+        "total_weight_g": 1000.0,
+        "url": "/srebarna-moneta-1-kg-koala",
+        "sell_price_eur": 3175.12,
+        "buy_price_eur": 2888.29,
+        "price_per_g_fine_eur": 3.1782982982982984
+      },
+      {
+        "id": 435,
+        "product_name": "1 кг Сребърна Монета Австралийска Кукабура",
+        "product_type": "coin",
+        "total_weight_g": 1000.0,
+        "url": "/srebarna-moneta-1-kg-kukabura",
+        "sell_price_eur": 3175.12,
+        "buy_price_eur": 2888.29,
+        "price_per_g_fine_eur": 3.1782982982982984
+      },
+      {
+        "id": 398,
+        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Кенгуру",
+        "product_type": "coin",
+        "total_weight_g": 31.1,
+        "url": "/srebarna-moneta-1-oz-kenguru",
+        "sell_price_eur": 101.05,
+        "buy_price_eur": 91.98,
+        "price_per_g_fine_eur": 3.2524485900691684
+      }
+    ],
+    "product_types_top5": {
+      "bars": 1,
+      "coins": 4
+    },
+    "affordable_deals": [
+      {
+        "product_name": "155.5 гр. ( 5 toz. ) Сребърна Монета Австралийски Лунар Петел 2017",
+        "product_type": "coin",
+        "total_weight_g": 155.5,
+        "url": "/srebarna-moneta-5-oz-lunar-petel-2017",
+        "sell_price_eur": 239.28,
+        "buy_price_eur": 186.11,
+        "price_per_g_fine_eur": 1.5403184535017331
+      },
+      {
+        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Кенгуру",
+        "product_type": "coin",
+        "total_weight_g": 31.1,
+        "url": "/srebarna-moneta-1-oz-kenguru",
+        "sell_price_eur": 101.05,
+        "buy_price_eur": 91.98,
+        "price_per_g_fine_eur": 3.2524485900691684
+      },
+      {
+        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Кругерранд",
+        "product_type": "coin",
+        "total_weight_g": 31.1,
+        "url": "/srebarna-moneta-1-oz-krugerrand",
+        "sell_price_eur": 101.05,
+        "buy_price_eur": 91.98,
+        "price_per_g_fine_eur": 3.2524485900691684
+      },
+      {
         "product_name": "31.1 гр. (1 toz.) Сребърна Монета Британия",
         "product_type": "coin",
         "total_weight_g": 31.1,
@@ -29,7 +182,15 @@
         "price_per_g_fine_eur": 3.303303303303303
       },
       {
-        "id": 547,
+        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Мексикански Либертад",
+        "product_type": "coin",
+        "total_weight_g": 31.1,
+        "url": "/srebarna-moneta-1-oz-meksikanski-libertad",
+        "sell_price_eur": 104.3,
+        "buy_price_eur": 95.1,
+        "price_per_g_fine_eur": 3.3570548040001413
+      },
+      {
         "product_name": "155.5 гр. (5 toz.) Сребърна Монета Кленов Лист",
         "product_type": "coin",
         "total_weight_g": 155.5,
@@ -39,7 +200,6 @@
         "price_per_g_fine_eur": 3.396644232657094
       },
       {
-        "id": 532,
         "product_name": "30 гр. Сребърна Монета Китайска Панда 2026",
         "product_type": "coin",
         "total_weight_g": 30.0,
@@ -49,7 +209,6 @@
         "price_per_g_fine_eur": 3.7530864197530867
       },
       {
-        "id": 537,
         "product_name": "31.1 гр. (1 toz.) Сребърно Кюлче Локи Royal Mint",
         "product_type": "bar",
         "total_weight_g": 31.1,
@@ -59,113 +218,108 @@
         "price_per_g_fine_eur": 3.896852707778817
       },
       {
-        "id": 564,
-        "product_name": "311 гр. (10 toz.) Сребърна Монета Австралийскa Кукабура 2026",
-        "product_type": "coin",
-        "total_weight_g": 311.0,
-        "url": "/srebarna-moneta-10-oz-kukabura-2026",
-        "sell_price_eur": 1254.2,
-        "buy_price_eur": 826.25,
-        "price_per_g_fine_eur": 4.036834261914648
-      }
-    ],
-    "product_types_top5": {
-      "bars": 1,
-      "coins": 4
-    },
-    "affordable_deals": [
-      {
-        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Британия",
+        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Австралийска Коала 2025 RAM",
         "product_type": "coin",
         "total_weight_g": 31.1,
-        "sell_price_eur": 102.63,
-        "buy_price_eur": 92.7,
-        "price_per_g_fine_eur": 3.303303303303303
-      },
-      {
-        "product_name": "155.5 гр. (5 toz.) Сребърна Монета Кленов Лист",
-        "product_type": "coin",
-        "total_weight_g": 155.5,
-        "sell_price_eur": 527.65,
-        "buy_price_eur": 402.39,
-        "price_per_g_fine_eur": 3.396644232657094
-      },
-      {
-        "product_name": "30 гр. Сребърна Монета Китайска Панда 2026",
-        "product_type": "coin",
-        "total_weight_g": 30.0,
-        "sell_price_eur": 112.48,
-        "buy_price_eur": 79.76,
-        "price_per_g_fine_eur": 3.7530864197530867
-      },
-      {
-        "product_name": "31.1 гр. (1 toz.) Сребърно Кюлче Локи Royal Mint",
-        "product_type": "bar",
-        "total_weight_g": 31.1,
-        "sell_price_eur": 121.18,
-        "buy_price_eur": 82.83,
-        "price_per_g_fine_eur": 3.896852707778817
+        "url": "/srebarna-moneta-1-oz-koala-2025",
+        "sell_price_eur": 127.82,
+        "buy_price_eur": 80.27,
+        "price_per_g_fine_eur": 4.110378883547519
       },
       {
         "product_name": "31.1 гр. (1 toz.) Сребърна Монета Captain America vs. Thanos & Pamp Швейцария 2025",
         "product_type": "coin",
         "total_weight_g": 31.1,
+        "url": "/srebarna-moneta-1-oz-marvel-kapitan-amerika-2025",
         "sell_price_eur": 129.87,
         "buy_price_eur": 79.25,
         "price_per_g_fine_eur": 4.176301874560447
-      },
-      {
-        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Австралийскa Кукабура 2026",
-        "product_type": "coin",
-        "total_weight_g": 31.1,
-        "sell_price_eur": 129.87,
-        "buy_price_eur": 86.41,
-        "price_per_g_fine_eur": 4.180064308681672
-      },
-      {
-        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Кленов Лист за Празник 2026",
-        "product_type": "coin",
-        "total_weight_g": 31.1,
-        "sell_price_eur": 144.18,
-        "buy_price_eur": 93.57,
-        "price_per_g_fine_eur": 4.640653515251586
-      },
-      {
-        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Кленов Лист Година на Коня 2026",
-        "product_type": "coin",
-        "total_weight_g": 31.1,
-        "sell_price_eur": 151.34,
-        "buy_price_eur": 93.57,
-        "price_per_g_fine_eur": 4.8711090511733595
-      },
-      {
-        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Кленов Лист с гриф Вълк 2026",
-        "product_type": "coin",
-        "total_weight_g": 31.1,
-        "sell_price_eur": 151.34,
-        "buy_price_eur": 93.57,
-        "price_per_g_fine_eur": 4.8711090511733595
-      },
-      {
-        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Австралийски Лунар Змия 2025",
-        "product_type": "coin",
-        "total_weight_g": 31.1,
-        "sell_price_eur": 158.5,
-        "buy_price_eur": 97.15,
-        "price_per_g_fine_eur": 5.101564587095133
       }
     ],
     "price_increases": [
       {
-        "id": 543,
-        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Британия",
-        "url": "/1-oz-srebarna-moneta-britania",
-        "today_price": 3.303303303303303,
-        "yesterday_price": 3.2106061044967795,
-        "change_pct": 2.88721804511278
+        "id": 445,
+        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Цветен Австралийски Лунар Кон 2026",
+        "url": "/srebarna-moneta-1-oz-tzveten-lunar-kon-2026",
+        "today_price": 8.343391623134389,
+        "yesterday_price": 3.3570548040001413,
+        "change_pct": 148.5330776605945
+      },
+      {
+        "id": 495,
+        "product_name": "155.5 гр. (5 toz.) Сребърна Монета Кленов Лист",
+        "url": "/srebarna-moneta-5-oz-klenov-list",
+        "today_price": 3.396644232657094,
+        "yesterday_price": 2.0044481780816183,
+        "change_pct": 69.4553278951763
+      },
+      {
+        "id": 471,
+        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Мечо Пух Любовта към Меда 2025",
+        "url": "/srebarna-moneta-1-oz-mecho-puh-2025",
+        "today_price": 7.80040490651423,
+        "yesterday_price": 6.12187750451416,
+        "change_pct": 27.418506834910616
+      },
+      {
+        "id": 476,
+        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Позлатен Австралийски Лунар Кон 2026",
+        "url": "/srebarna-moneta-1-oz-lunar-kon-2026-pozlaten",
+        "today_price": 8.9031153339835,
+        "yesterday_price": 7.241003060938752,
+        "change_pct": 22.954171667333412
+      },
+      {
+        "id": 417,
+        "product_name": "31.1 гр. (1 toz.)Сребърна Монета Mickey & Friends Disney & Pamp Швейцария 2025",
+        "url": "/srebarna-moneta-1-oz-pamp-miki-i-priyateli-2025",
+        "today_price": 7.053438462817343,
+        "yesterday_price": 7.037038108955591,
+        "change_pct": 0.2330576246401256
       }
     ],
-    "price_decreases": [],
+    "price_decreases": [
+      {
+        "id": 481,
+        "product_name": "30 гр. Сребърна Монета Китайска Панда 2026",
+        "url": "/srebarna-moneta-30-g-panda-2026",
+        "today_price": 3.7530864197530867,
+        "yesterday_price": 104.39105772439106,
+        "change_pct": -96.40478169149141
+      },
+      {
+        "id": 401,
+        "product_name": "31.1 гр. (1 toz.) Сребърна Монета Мексикански Либертад",
+        "url": "/srebarna-moneta-1-oz-meksikanski-libertad",
+        "today_price": 3.3570548040001413,
+        "yesterday_price": 81.31250221282374,
+        "change_pct": -95.87141618737358
+      },
+      {
+        "id": 423,
+        "product_name": "62.2 гр. ( 2 toz. ) Сребърна 3D Монета Thor Kra Koom Marvel 2025",
+        "url": "/3d-srebarna-moneta-2-oz-thor-kra-koom-2025",
+        "today_price": 4.45155766699175,
+        "yesterday_price": 79.05799690365606,
+        "change_pct": -94.36925062442876
+      },
+      {
+        "id": 416,
+        "product_name": "31.1 гр. ( 1 toz. )Сребърна Монета Iron Мan vs. Ultron Marvel & Pamp Швейцария 2025",
+        "url": "/srebarna-moneta-1-oz-iron-man-vs-ultron-marvel",
+        "today_price": 5.096972719780017,
+        "yesterday_price": 87.48720531217108,
+        "change_pct": -94.17403641870484
+      },
+      {
+        "id": 408,
+        "product_name": "31.1 гр. ( 1 toz. ) Сребърна Монета Австралийска Коала 2025 RAM",
+        "url": "/srebarna-moneta-1-oz-koala-2025",
+        "today_price": 4.110378883547519,
+        "yesterday_price": 46.958072012989085,
+        "change_pct": -91.24670433145009
+      }
+    ],
     "live_price_today": null,
     "live_price_yesterday": null,
     "live_price_change_pct": null
