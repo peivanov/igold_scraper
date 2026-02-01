@@ -368,32 +368,40 @@ class DailyReportGenerator:
         return increases, decreases
 
     def get_new_products(
-        self, metal_type: str, today_start: int, today_end: int, yesterday_start: int, yesterday_end: int
+        self, metal_type: str, today_start: int, today_end: int
     ) -> List[Dict]:
-        """Get products that have prices today but not yesterday."""
+        """Get products that were first seen within the last 7 days (truly new listings)."""
+        # Calculate 7 days ago timestamp
+        seven_days_ago = today_start - (7 * 24 * 60 * 60)
+        
         cursor = self.db.conn.execute(
             """
+            WITH FirstSeen AS (
+                SELECT 
+                    p.id,
+                    p.product_name,
+                    p.url,
+                    MIN(ph.timestamp) as first_timestamp
+                FROM products p
+                JOIN price_history ph ON p.id = ph.product_id
+                WHERE p.metal_type = ?
+                GROUP BY p.id
+            )
             SELECT DISTINCT
-                p.id,
-                p.product_name,
-                p.url,
+                fs.id,
+                fs.product_name,
+                fs.url,
                 (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) as price_per_g_fine_eur,
                 ph.sell_price_eur
-            FROM products p
+            FROM FirstSeen fs
+            JOIN products p ON fs.id = p.id
             JOIN price_history ph ON p.id = ph.product_id
-            WHERE p.metal_type = ?
+            WHERE fs.first_timestamp >= ?
             AND ph.timestamp >= ? AND ph.timestamp <= ?
-            AND p.id NOT IN (
-                SELECT DISTINCT p2.id
-                FROM products p2
-                JOIN price_history ph2 ON p2.id = ph2.product_id
-                WHERE p2.metal_type = ?
-                AND ph2.timestamp >= ? AND ph2.timestamp <= ?
-            )
             ORDER BY price_per_g_fine_eur ASC
             LIMIT 10
         """,
-            (metal_type, today_start, today_end, metal_type, yesterday_start, yesterday_end),
+            (metal_type, seven_days_ago, today_start, today_end),
         )
 
         return [dict(row) for row in cursor.fetchall()]
@@ -537,8 +545,8 @@ class DailyReportGenerator:
         total_products_today = self.get_product_count(metal_type, today_start, today_end)
         total_products_yesterday = self.get_product_count(metal_type, yesterday_start, yesterday_end)
 
-        # Get new products
-        new_products = self.get_new_products(metal_type, today_start, today_end, yesterday_start, yesterday_end)
+        # Get new products (first seen within last 7 days)
+        new_products = self.get_new_products(metal_type, today_start, today_end)
 
         # Get price movers
         price_increases, price_decreases = self.get_price_movers(
