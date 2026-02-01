@@ -44,7 +44,7 @@ class DatabaseManager:
                 product_type TEXT NOT NULL CHECK(product_type IN ('bar', 'coin', 'unknown')),
                 total_weight_g REAL NOT NULL,
                 purity_per_mille REAL NOT NULL,
-                UNIQUE(product_name, metal_type)
+                UNIQUE(url, metal_type)
             );
 
             CREATE TABLE IF NOT EXISTS price_history (
@@ -100,8 +100,8 @@ class DatabaseManager:
                     url, product_name, metal_type, product_type,
                     total_weight_g, purity_per_mille
                 ) VALUES (?, ?, ?, ?, ?, ?)
-                ON CONFLICT(product_name, metal_type) DO UPDATE SET
-                    url = excluded.url,
+                ON CONFLICT(url, metal_type) DO UPDATE SET
+                    product_name = excluded.product_name,
                     product_type = excluded.product_type,
                     total_weight_g = excluded.total_weight_g,
                     purity_per_mille = excluded.purity_per_mille
@@ -141,14 +141,20 @@ class DatabaseManager:
         Returns:
             True if successful
         """
-        # Validate prices
-        if sell_price_eur is None or sell_price_eur <= 0:
-            logger.warning("Invalid sell price for %s: %s", url, sell_price_eur)
+        # Validate prices - must have at least one valid price
+        has_sell = sell_price_eur and sell_price_eur > 0
+        has_buy = buy_price_eur and buy_price_eur > 0
+        
+        if not (has_sell or has_buy):
+            logger.warning(
+                "Invalid prices for %s: sell=%s, buy=%s (need at least one > 0)",
+                url, sell_price_eur, buy_price_eur
+            )
             return False
-
-        if buy_price_eur is None or buy_price_eur < 0:
-            logger.warning("Invalid buy price for %s: %s", url, buy_price_eur)
-            return False
+        
+        # Use 0.0 for missing prices
+        sell_price_eur = sell_price_eur if has_sell else 0.0
+        buy_price_eur = buy_price_eur if has_buy else 0.0
 
         try:
             # Get product ID

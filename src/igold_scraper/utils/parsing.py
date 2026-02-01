@@ -27,6 +27,69 @@ HEADERS = {
 # SORTING AND FILTERING (Shared by both scrapers)
 # ============================================================================
 
+
+def parse_weight(weight_str: Optional[str]) -> Optional[float]:
+    """
+    Parse weight string to float (always in grams).
+
+    Args:
+        weight_str: Weight string like "31.1 гр." or "15 кг" or None
+
+    Returns:
+        Weight as float in grams or None
+    """
+    if not weight_str:
+        return None
+
+    try:
+        parts = weight_str.split()
+        weight = float(parts[0])
+        
+        # Check if unit is kg and convert to grams
+        if len(parts) > 1 and 'кг' in parts[1].lower():
+            weight = weight * 1000.0
+            
+        return weight
+    except (ValueError, IndexError):
+        return None
+
+
+def parse_purity(purity_str: Optional[str]) -> Optional[float]:
+    """
+    Parse purity string to float (per mille).
+
+    Args:
+        purity_str: Purity string like "999.9/1000" or "900/1000" or None
+
+    Returns:
+        Purity as float (0-1000) or None
+    """
+    if not purity_str:
+        return None
+
+    try:
+        # Handle formats like "999.9/1000" or "999"
+        purity_str = purity_str.split()[0]
+        if "/" in purity_str:
+            purity = float(purity_str.split("/")[0])
+        else:
+            purity = float(purity_str)
+        
+        # Validate range - purity per mille should be 0-1000
+        # If it's > 1000, it's likely in wrong format (e.g. 99999 instead of 999.99)
+        if purity > 1000:
+            # Assume it's 10x too large (common error: 99999 instead of 999.99)
+            purity = purity / 10.0
+            
+        # Final validation
+        if purity < 0 or purity > 1000:
+            return None
+            
+        return purity
+    except (ValueError, IndexError):
+        return None
+
+
 def sort_key_function(item: Dict) -> tuple:
     """
     Sort function that prioritizes items with price_per_g_fine_eur.

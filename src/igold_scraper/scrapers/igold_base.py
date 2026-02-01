@@ -13,6 +13,7 @@ from lxml import html
 
 from igold_scraper.scrapers.base import BaseScraper, ScraperConfig, Product
 from igold_scraper.config import get_config
+from igold_scraper.utils.parsing import parse_weight, parse_purity
 from igold_scraper.constants import xpaths
 
 logger = logging.getLogger(__name__)
@@ -198,8 +199,8 @@ class IgoldBaseScraper(BaseScraper):
         details = self._extract_product_details(tree)
 
         # Parse weight and purity
-        weight = self._parse_weight(details.get("Тегло"))
-        purity = self._parse_purity(details.get("Проба"))
+        weight = parse_weight(details.get("Тегло"))
+        purity = parse_purity(details.get("Проба"))
 
         # Apply default purity if needed
         if purity is None:
@@ -207,7 +208,7 @@ class IgoldBaseScraper(BaseScraper):
 
         # Extract or calculate fine metal content
         fine_metal_label = "Чисто злато" if self.metal_type == "gold" else "Чисто сребро"
-        fine_metal = self._parse_weight(details.get(fine_metal_label))
+        fine_metal = parse_weight(details.get(fine_metal_label))
 
         if fine_metal is None and weight is not None and purity is not None:
             fine_metal = weight * (purity / 1000.0)
@@ -306,46 +307,6 @@ class IgoldBaseScraper(BaseScraper):
                     details_dict[key.strip()] = value.strip()
 
         return details_dict
-
-    def _parse_weight(self, weight_str: Optional[str]) -> Optional[float]:
-        """
-        Parse weight string to float.
-
-        Args:
-            weight_str: Weight string like "31.1 гр." or None
-
-        Returns:
-            Weight as float or None
-        """
-        if not weight_str:
-            return None
-
-        try:
-            return float(weight_str.split()[0])
-        except (ValueError, IndexError):
-            return None
-
-    def _parse_purity(self, purity_str: Optional[str]) -> Optional[float]:
-        """
-        Parse purity string to float (per mille).
-
-        Args:
-            purity_str: Purity string like "999.9/1000" or "900/1000" or None
-
-        Returns:
-            Purity as float (0-1000) or None
-        """
-        if not purity_str:
-            return None
-
-        try:
-            # Handle formats like "999.9/1000" or "999"
-            purity_str = purity_str.split()[0]
-            if "/" in purity_str:
-                return float(purity_str.split("/")[0])
-            return float(purity_str)
-        except (ValueError, IndexError):
-            return None
 
     def _detect_product_type(self, title: str) -> str:
         """

@@ -135,6 +135,7 @@ class DailyReportGenerator:
                     p.product_type,
                     p.total_weight_g,
                     p.purity_per_mille,
+                    p.url,
                     ph.sell_price_eur,
                     ph.buy_price_eur,
                     (ph.sell_price_eur / (p.total_weight_g * p.purity_per_mille / 1000.0)) as price_per_g_fine_eur,
@@ -152,6 +153,7 @@ class DailyReportGenerator:
                 product_name,
                 product_type,
                 total_weight_g,
+                url,
                 sell_price_eur,
                 buy_price_eur,
                 price_per_g_fine_eur
@@ -301,14 +303,16 @@ class DailyReportGenerator:
             WHERE p.metal_type = ?
             AND ph.timestamp >= ? AND ph.timestamp <= ?
             AND p.id NOT IN (
-                SELECT DISTINCT ph2.product_id
-                FROM price_history ph2
-                WHERE ph2.timestamp >= ? AND ph2.timestamp <= ?
+                SELECT DISTINCT p2.id
+                FROM products p2
+                JOIN price_history ph2 ON p2.id = ph2.product_id
+                WHERE p2.metal_type = ?
+                AND ph2.timestamp >= ? AND ph2.timestamp <= ?
             )
             ORDER BY price_per_g_fine_eur ASC
             LIMIT 10
         """,
-            (metal_type, today_start, today_end, yesterday_start, yesterday_end),
+            (metal_type, today_start, today_end, metal_type, yesterday_start, yesterday_end),
         )
 
         return [dict(row) for row in cursor.fetchall()]
@@ -509,10 +513,24 @@ class DailyReportGenerator:
         best_deals_text = ""
         for i, product in enumerate(stats["best_deals"][:5], 1):
             name = product["product_name"][:50]
+            url = product.get("url", "")
+            product_type = product.get("product_type", "unknown")
             price_per_g = product["price_per_g_fine_eur"]
             sell_price = product.get("sell_price_eur", 0)
+            buy_price = product.get("buy_price_eur", 0)
 
-            deal_line = f"{i}. **{name}**\n   {price_per_g:.2f} €/g | Total: {sell_price:.0f} €"
+            # Product type emoji
+            type_emoji = "🪙" if product_type == "coin" else "📊"
+
+            # Calculate spread if both prices available
+            spread_text = ""
+            if sell_price > 0 and buy_price > 0:
+                spread_pct = ((sell_price - buy_price) / sell_price) * 100
+                spread_text = f" | Spread: {spread_pct:.1f}%"
+
+            # Add hyperlink to product name if URL available
+            name_display = f"[{name}]({url})" if url else f"**{name}**"
+            deal_line = f"{type_emoji} {i}. {name_display}\n   {price_per_g:.2f} €/g | Total: {sell_price:.0f} €{spread_text}"
             best_deals_text += deal_line + "\n"
 
         # Build affordable deals
@@ -520,10 +538,24 @@ class DailyReportGenerator:
         if "affordable_deals" in stats and stats["affordable_deals"]:
             for i, product in enumerate(stats["affordable_deals"][:5], 1):
                 name = product["product_name"][:50]
+                url = product.get("url", "")
+                product_type = product.get("product_type", "unknown")
                 price_per_g = product["price_per_g_fine_eur"]
                 sell_price = product.get("sell_price_eur", 0)
+                buy_price = product.get("buy_price_eur", 0)
 
-                deal_line = f"{i}. **{name}**\n   {price_per_g:.2f} €/g | {sell_price:.0f} €"
+                # Product type emoji
+                type_emoji = "🪙" if product_type == "coin" else "📊"
+
+                # Calculate spread if both prices available
+                spread_text = ""
+                if sell_price > 0 and buy_price > 0:
+                    spread_pct = ((sell_price - buy_price) / sell_price) * 100
+                    spread_text = f" | Spread: {spread_pct:.1f}%"
+
+                # Add hyperlink to product name if URL available
+                name_display = f"[{name}]({url})" if url else f"**{name}**"
+                deal_line = f"{type_emoji} {i}. {name_display}\n   {price_per_g:.2f} €/g | {sell_price:.0f} €{spread_text}"
                 affordable_text += deal_line + "\n"
 
         # Build price movers (biggest decreases - good for buyers!)
@@ -575,7 +607,15 @@ class DailyReportGenerator:
         if stats["new_products_count"] > 0:
             new_text = f"{stats['new_products_count']} new product(s) today"
             if stats.get("new_products"):
-                new_text += "\n" + "\n".join([f"• {p['product_name'][:40]}" for p in stats["new_products"][:3]])
+                new_lines = []
+                for p in stats["new_products"][:3]:
+                    name = p['product_name'][:40]
+                    url = p.get('url', '')
+                    if url:
+                        new_lines.append(f"• [{name}]({url})")
+                    else:
+                        new_lines.append(f"• {name}")
+                new_text += "\n" + "\n".join(new_lines)
             fields.append({"name": "🆕 New Listings", "value": new_text, "inline": False})
 
         # Best deals

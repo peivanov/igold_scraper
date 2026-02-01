@@ -65,7 +65,6 @@ def main() -> None:
 
         # Extract prices from category page
         category_prices = scraper.extract_category_prices(full_url)
-        logger.info("Extracted %d prices from category page", len(category_prices))
 
         # Process each product
         for price_data in category_prices:
