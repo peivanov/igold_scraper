@@ -41,8 +41,7 @@ def sort_key_function(item: Dict) -> tuple:
     price_per_g = item.get('price_per_g_fine_eur')
     if price_per_g is not None:
         return (0, price_per_g)  # (priority, price) - 0 = high priority
-    else:
-        return (1, 0)  # (priority, fallback) - 1 = low priority
+    return (1, 0)  # (priority, fallback) - 1 = low priority
 
 
 # ============================================================================
