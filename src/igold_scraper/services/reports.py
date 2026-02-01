@@ -36,8 +36,6 @@ class DailyReportGenerator:
         """
         self.db = DatabaseManager(db_path)
         self.data_dir = Path("data")
-        self.stats_dir = self.data_dir / "statistics"
-        self.stats_dir.mkdir(parents=True, exist_ok=True)
 
     def get_day_boundaries(self, date: datetime) -> tuple[int, int]:
         """
@@ -102,10 +100,12 @@ class DailyReportGenerator:
                 price_per_g_fine_eur
             FROM RankedPrices
             WHERE rn = 1
+            AND price_per_g_fine_eur >= CASE WHEN ? = 'gold' THEN 70 ELSE 1.0 END
+            AND sell_price_eur >= CASE WHEN ? = 'gold' THEN 200 ELSE 30 END
             ORDER BY price_per_g_fine_eur ASC
             LIMIT ?
         """,
-            (metal_type, timestamp_start, timestamp_end, top_n),
+            (metal_type, timestamp_start, timestamp_end, metal_type, metal_type, top_n),
         )
 
         return [dict(row) for row in cursor.fetchall()]
@@ -159,10 +159,12 @@ class DailyReportGenerator:
                 price_per_g_fine_eur
             FROM RankedPrices
             WHERE rn = 1
+            AND price_per_g_fine_eur >= CASE WHEN ? = 'gold' THEN 70 ELSE 1.0 END
+            AND sell_price_eur >= CASE WHEN ? = 'gold' THEN 200 ELSE 30 END
             ORDER BY price_per_g_fine_eur ASC
             LIMIT ?
         """,
-            (metal_type, day_start, timestamp, price_limit, top_n),
+            (metal_type, day_start, timestamp, price_limit, metal_type, metal_type, top_n),
         )
 
         return [dict(row) for row in cursor.fetchall()]
@@ -529,7 +531,8 @@ class DailyReportGenerator:
                 spread_text = f" | Spread: {spread_pct:.1f}%"
 
             # Add hyperlink to product name if URL available
-            name_display = f"[{name}]({url})" if url else f"**{name}**"
+            full_url = f"https://igold.bg{url}" if url and url.startswith('/') else url
+            name_display = f"[{name}]({full_url})" if full_url else f"**{name}**"
             deal_line = f"{type_emoji} {i}. {name_display}\n   {price_per_g:.2f} €/g | Total: {sell_price:.0f} €{spread_text}"
             best_deals_text += deal_line + "\n"
 
@@ -554,7 +557,8 @@ class DailyReportGenerator:
                     spread_text = f" | Spread: {spread_pct:.1f}%"
 
                 # Add hyperlink to product name if URL available
-                name_display = f"[{name}]({url})" if url else f"**{name}**"
+                full_url = f"https://igold.bg{url}" if url and url.startswith('/') else url
+                name_display = f"[{name}]({full_url})" if full_url else f"**{name}**"
                 deal_line = f"{type_emoji} {i}. {name_display}\n   {price_per_g:.2f} €/g | {sell_price:.0f} €{spread_text}"
                 affordable_text += deal_line + "\n"
 
@@ -612,7 +616,8 @@ class DailyReportGenerator:
                     name = p['product_name'][:40]
                     url = p.get('url', '')
                     if url:
-                        new_lines.append(f"• [{name}]({url})")
+                        full_url = f"https://igold.bg{url}" if url.startswith('/') else url
+                        new_lines.append(f"• [{name}]({full_url})")
                     else:
                         new_lines.append(f"• {name}")
                 new_text += "\n" + "\n".join(new_lines)
@@ -704,19 +709,6 @@ class DailyReportGenerator:
             stats = self.calculate_daily_statistics(
                 today, yesterday, today_live_price, yesterday_live_price, metal_type
             )
-
-            # Save report
-            report = {
-                "report_type": "daily",
-                "metal_type": metal_type,
-                "report_date": today.strftime("%Y-%m-%d"),
-                "statistics": stats,
-            }
-
-            report_file = self.stats_dir / f"{metal_type}_daily_{today.strftime('%Y-%m-%d')}.json"
-            with open(report_file, "w", encoding="utf-8") as f:
-                json.dump(report, f, ensure_ascii=False, indent=2)
-            logger.info("Saved daily %s report to %s", metal_type, report_file)
 
             # Send Discord notification
             discord_message = self.format_discord_message(stats, metal_type)
