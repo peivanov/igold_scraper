@@ -1,0 +1,24 @@
+[
+  {
+    "timestamp": "2026-02-07T22:09:28.180000",
+    "date": "2026-02-08",
+    "metal": "XAU",
+    "metal_name": "gold",
+    "source": "Live XAU/EUR Market Data",
+    "platform": "MarketData",
+    "spread_profile": "standard",
+    "prices": {
+      "eur_per_oz": {
+        "bid": 4199.38,
+        "ask": 4204.82,
+        "mid": 4202.1,
+        "spread": 12.2
+      },
+      "eur_per_gram": {
+        "bid": 135.01,
+        "ask": 135.19,
+        "mid": 135.1
+      }
+    }
+  }
+]
